@@ -18,7 +18,7 @@ public enum BulkDataType {
 	APPLICATION_REDBOOK_TEXT("data/patent/application/redbook/fulltext/", "zip"),
 	APPLICATION_REDBOOK_BIBLIO("data/patent/application/redbook/bibliographic/", "zip");
 
-	private static String BASEURL = "https://bulkdata.uspto.gov/";
+	private static String BASEURL = "https://data.uspto.gov/bulkdata/datasets/";
 	private String restPath;
 	private String suffix;
 

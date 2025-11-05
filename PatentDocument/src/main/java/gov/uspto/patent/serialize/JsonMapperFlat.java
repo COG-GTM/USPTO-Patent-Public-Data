@@ -310,8 +310,8 @@ public class JsonMapperFlat implements DocumentBuilder<Patent> {
         for (Inventor inventor : inventors) {
             switch (inventorField) {
             case NATIONALITY:
-                if (inventor.getNationality() != null) {
-                    arBldr.add(inventor.getNationality().toString());
+                if (inventor.getResidency() != null) {
+                    arBldr.add(inventor.getResidency().toString());
                 }
                 break;
             case RESIDENCE:

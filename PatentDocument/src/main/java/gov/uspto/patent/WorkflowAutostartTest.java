@@ -1,3 +1,5 @@
+//SQ scan - take infinite 
+
 package gov.uspto.patent;
 
 import java.io.BufferedReader;

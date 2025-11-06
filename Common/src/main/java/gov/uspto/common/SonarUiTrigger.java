@@ -1,3 +1,5 @@
+//TEST SQ SCAN
+
 package gov.uspto.common;
 
 import java.security.MessageDigest;
@@ -8,7 +10,7 @@ import javax.crypto.NoSuchPaddingException;
 
 /**
  * Simple test file for triggering SonarCloud workflow.
- * Edit the EDIT_ME string in GitHub UI to retrigger the workflow.
+ * Edit the TEST_ME string in GitHub UI to retrigger the workflow.
  */
 public class SonarUiTrigger {
     public static final String EDIT_ME = "change-me";

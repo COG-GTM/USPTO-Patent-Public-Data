@@ -43,8 +43,7 @@ jobs:
           mvn -B verify -DskipTests org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
             -Dsonar.projectKey=uspto-patent-public-data \
             -Dsonar.organization=uspto-patent-public-data \
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.qualitygate.wait=true
+            -Dsonar.host.url=https://sonarcloud.io
       
       - name: Quality Gate Check
         id: quality-gate

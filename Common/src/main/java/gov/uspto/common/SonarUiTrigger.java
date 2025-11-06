@@ -14,6 +14,7 @@ import javax.crypto.NoSuchPaddingException;
  */
 public class SonarUiTrigger {
     public static final String EDIT_ME = "change-me";
+    private final Random random = new Random();
 
     public String insecureMd5(String input) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("MD5"); // Sonar: weak crypto
@@ -28,16 +29,15 @@ public class SonarUiTrigger {
     }
 
     public String insecureToken() {
-        Random r = new Random();
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 32; i++) {
-            sb.append(Integer.toHexString(r.nextInt(16)));
+            sb.append(Integer.toHexString(random.nextInt(16)));
         }
         return sb.toString();
     }
 
     public Cipher badCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {
-        return Cipher.getInstance("AES/ECB/PKCS5Padding");
+        return Cipher.getInstance("AES/CBC/PKCS5Padding");
     }
 
     public void emptyCatch() {

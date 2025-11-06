@@ -1,53 +1,337 @@
-# This workflow uses Maven SonarCloud scanner to analyze code quality
-# and populates GitHub Code Scanning alerts with the vulnerabilities found.
-
-name: SonarCloud analysis
+name: SonarCloud Security Scan
 
 on:
   push:
-    branches: [ "master" ]
+    branches:
+      - master
   pull_request:
     types: [opened, synchronize, reopened]
-  workflow_dispatch:
-
-permissions:
-  contents: read
-  pull-requests: write
-  security-events: write
 
 jobs:
-  build:
-    name: Build and analyze
+  security-scan:
+    name: SonarCloud Security Scan
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for better relevancy of analysis
-
+          fetch-depth: 0
+      
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'zulu'
-          cache: 'maven'
-
+          cache: maven
+      
       - name: Cache SonarCloud packages
         uses: actions/cache@v4
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
-
-      - name: Cache Maven packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
-
+      
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B verify -DskipTests org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=uspto-patent-public-data
+        run: |
+          mvn -B verify -DskipTests org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -Dsonar.projectKey=uspto-patent-public-data \
+            -Dsonar.organization=uspto-patent-public-data \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.qualitygate.wait=true
+      
+      - name: Quality Gate Check
+        id: quality-gate
+        continue-on-error: true
+        uses: SonarSource/sonarqube-quality-gate-action@master
+        timeout-minutes: 5
+        with:
+          scanMetadataReportFile: target/sonar/report-task.txt
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      
+      - name: Check if Devin Remediation Commit
+        id: check-devin
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            git fetch origin ${{ github.head_ref }}
+            COMMIT_AUTHOR=$(git log -1 --format='%an' origin/${{ github.head_ref }})
+            COMMIT_MSG=$(git log -1 --format='%s' origin/${{ github.head_ref }})
+            echo "Checking PR commit - Author: $COMMIT_AUTHOR"
+            echo "Commit message: $COMMIT_MSG"
+          else
+            COMMIT_AUTHOR="${{ github.event.head_commit.author.name }}"
+            COMMIT_MSG="${{ github.event.head_commit.message }}"
+            echo "Checking push commit - Author: $COMMIT_AUTHOR"
+          fi
+          
+          if [[ "$COMMIT_AUTHOR" == "Devin AI" ]] || [[ "$COMMIT_MSG" == *"[devin-remediation]"* ]]; then
+            echo "is_devin_commit=true" >> $GITHUB_OUTPUT
+            echo "🤖 Detected Devin remediation commit - skipping new session trigger"
+          else
+            echo "is_devin_commit=false" >> $GITHUB_OUTPUT
+            echo "👤 Human commit detected"
+          fi
+      
+      - name: Extract Quality Gate Failure Details
+        id: extract-issues
+        if: steps.quality-gate.outcome == 'failure'
+        run: |
+          echo "📊 Extracting quality gate failure details from SonarCloud..."
+          
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            PR_PARAM="&pullRequest=${{ github.event.pull_request.number }}"
+          else
+            PR_PARAM=""
+          fi
+          
+          ALL_ISSUES=$(curl -s -u "${{ secrets.SONAR_TOKEN }}:" \
+            "https://sonarcloud.io/api/issues/search?componentKeys=uspto-patent-public-data${PR_PARAM}&resolved=false&severities=BLOCKER,CRITICAL,MAJOR&ps=100")
+          
+          QG_STATUS=$(curl -s -u "${{ secrets.SONAR_TOKEN }}:" \
+            "https://sonarcloud.io/api/qualitygates/project_status?projectKey=uspto-patent-public-data${PR_PARAM}")
+          
+          VULNERABILITIES=$(echo "$ALL_ISSUES" | jq '[.issues[] | select(.type=="VULNERABILITY")] | length')
+          BUGS=$(echo "$ALL_ISSUES" | jq '[.issues[] | select(.type=="BUG")] | length')
+          CODE_SMELLS=$(echo "$ALL_ISSUES" | jq '[.issues[] | select(.type=="CODE_SMELL")] | length')
+          SECURITY_HOTSPOTS=$(echo "$ALL_ISSUES" | jq '[.issues[] | select(.type=="SECURITY_HOTSPOT")] | length')
+          TOTAL_ISSUES=$(echo "$ALL_ISSUES" | jq '.total')
+          
+          FAILED_CONDITIONS=$(echo "$QG_STATUS" | jq -c '[.projectStatus.conditions[] | select(.status=="ERROR") | {metric: .metricKey, actual: .actualValue, threshold: .errorThreshold}]')
+          
+          ISSUE_SUMMARY=$(echo "$ALL_ISSUES" | jq -c --arg vuln "$VULNERABILITIES" --arg bugs "$BUGS" --arg smells "$CODE_SMELLS" --arg hotspots "$SECURITY_HOTSPOTS" '{
+            total: .total,
+            vulnerabilities: ($vuln | tonumber),
+            bugs: ($bugs | tonumber),
+            code_smells: ($smells | tonumber),
+            security_hotspots: ($hotspots | tonumber),
+            issues: [.issues[] | {
+              key: .key,
+              type: .type,
+              severity: .severity,
+              message: .message,
+              component: (.component | split(":") | if length > 1 then .[1] else .[0] end),
+              line: .line,
+              rule: .rule
+            }]
+          }')
+          
+          echo "total_issues=$TOTAL_ISSUES" >> $GITHUB_OUTPUT
+          echo "vulnerabilities=$VULNERABILITIES" >> $GITHUB_OUTPUT
+          echo "bugs=$BUGS" >> $GITHUB_OUTPUT
+          echo "code_smells=$CODE_SMELLS" >> $GITHUB_OUTPUT
+          echo "security_hotspots=$SECURITY_HOTSPOTS" >> $GITHUB_OUTPUT
+          
+          echo "issue_summary<<EOF" >> $GITHUB_OUTPUT
+          echo "$ISSUE_SUMMARY" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          
+          echo "failed_conditions<<EOF" >> $GITHUB_OUTPUT
+          echo "$FAILED_CONDITIONS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          
+          echo "⚠️  Quality Gate Failures:"
+          echo "   - Total Issues: $TOTAL_ISSUES"
+          echo "   - Vulnerabilities: $VULNERABILITIES"
+          echo "   - Bugs: $BUGS"
+          echo "   - Code Smells: $CODE_SMELLS"
+          echo "   - Security Hotspots: $SECURITY_HOTSPOTS"
+      
+      - name: Trigger Devin Remediation (Human PR Only)
+        id: trigger-devin
+        if: |
+          steps.quality-gate.outcome == 'failure' && 
+          steps.check-devin.outputs.is_devin_commit == 'false' &&
+          github.event_name == 'pull_request'
+        env:
+          DEVIN_API_KEY: ${{ secrets.DEVIN_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🤖 Triggering Devin AI Quality Gate Remediation Specialist..."
+          
+          TOTAL_ISSUES="${{ steps.extract-issues.outputs.total_issues }}"
+          VULNERABILITIES="${{ steps.extract-issues.outputs.vulnerabilities }}"
+          BUGS="${{ steps.extract-issues.outputs.bugs }}"
+          CODE_SMELLS="${{ steps.extract-issues.outputs.code_smells }}"
+          SECURITY_HOTSPOTS="${{ steps.extract-issues.outputs.security_hotspots }}"
+          ISSUE_SUMMARY='${{ steps.extract-issues.outputs.issue_summary }}'
+          FAILED_CONDITIONS='${{ steps.extract-issues.outputs.failed_conditions }}'
+          
+          SYSTEM_PROMPT="You are a SonarCloud Quality Gate Remediation Specialist for the USPTO Patent Public Data project with expertise in:
+
+          **Security & Vulnerabilities:**
+          - OWASP Top 10 vulnerabilities
+          - Secure coding practices for Java 8
+          - Input validation and sanitization
+          - Resource management and leak prevention
+          
+          **Code Quality & Reliability:**
+          - Bug detection and resolution (null pointer exceptions, resource leaks, logic errors)
+          - Exception handling best practices
+          - Proper use of Java 8 features and APIs
+          - Thread safety and concurrency issues
+          
+          **Maintainability:**
+          - Code smells and technical debt reduction
+          - Cognitive complexity reduction through refactoring
+          - Unused code removal
+          - Proper naming conventions
+          
+          **Project Context:**
+          - Java 8 Maven multi-module project (Common, PatentDocument, BulkDownloader)
+          - Patent document parsing and transformation system
+          - No frontend - pure Java backend
+          
+          **CRITICAL WORKFLOW INSTRUCTIONS:**
+          1. Commit ALL fixes in a SINGLE commit to the current branch
+          2. DO NOT create a new pull request
+          3. MUST tag your commit message with [devin-remediation] prefix
+          4. Run tests (mvn test) before committing
+          5. Your commit will trigger automatic re-scan - DO NOT trigger manually"
+          
+          USER_PROMPT="# SonarCloud Quality Gate Remediation - PR #${{ github.event.pull_request.number }}
+
+          ## Quality Gate Status
+          ❌ **FAILED** - Quality gate conditions not met
+
+          ## Issue Summary
+          - **Total Issues:** ${TOTAL_ISSUES}
+          - **Vulnerabilities:** ${VULNERABILITIES} 🔴
+          - **Bugs:** ${BUGS} 🐛
+          - **Code Smells:** ${CODE_SMELLS} 💨
+          - **Security Hotspots:** ${SECURITY_HOTSPOTS} 🔥
+          - **Project:** uspto-patent-public-data
+          - **Branch:** ${{ github.head_ref }}
+          - **PR:** #${{ github.event.pull_request.number }}
+
+          ## Failed Quality Gate Conditions
+          \`\`\`json
+          ${FAILED_CONDITIONS}
+          \`\`\`
+
+          ## Your Mission
+
+          ### Phase 1: Analysis
+          Review all SonarCloud issues focusing on:
+          - Security vulnerabilities (BLOCKER/CRITICAL)
+          - Reliability bugs
+          - High-severity code smells
+          
+          ### Phase 2: Implement Fixes
+
+          **Security & Vulnerabilities:**
+          - Resource leaks → Use try-with-resources
+          - Null pointer risks → Add null checks or use Optional
+          - Weak cryptography → Use secure algorithms
+          - Input validation → Sanitize user inputs
+          
+          **Bugs & Reliability:**
+          - Null pointer exceptions → Add proper null checks
+          - Resource leaks → Ensure proper resource cleanup
+          - Logic errors → Fix incorrect conditionals
+          - Exception handling → Use specific exception types
+          
+          **Code Smells:**
+          - Cognitive complexity → Refactor into smaller methods
+          - Unused code → Remove unused imports, variables, methods
+          - Code duplication → Extract common logic
+          
+          ### Phase 3: Validation
+          - Run \`mvn clean test\` to verify all tests pass
+          - Ensure build completes successfully
+          - Verify fixes address root causes
+          
+          ### Phase 4: Single Commit
+          - **Commit message:** \`fix: [devin-remediation] Resolve SonarCloud quality gate failures\`
+          - **Commit body:**
+            * Fixed ${VULNERABILITIES} vulnerabilities, ${BUGS} bugs, ${CODE_SMELLS} code smells
+            * List of SonarCloud rules resolved
+          - **Push to branch:** \`${{ github.head_ref }}\`
+
+          ## Resources
+          - 📊 [SonarCloud Dashboard](https://sonarcloud.io/dashboard?id=uspto-patent-public-data)
+          - 🔧 [GitHub Actions Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+          ## Detailed Issue Data
+          \`\`\`json
+          ${ISSUE_SUMMARY}
+          \`\`\`
+
+          ## Success Criteria
+          ✅ All BLOCKER/CRITICAL issues resolved
+          ✅ All tests pass
+          ✅ Quality gate passes on re-scan
+          ✅ No new issues introduced"
+          
+          DEVIN_SESSION=$(curl -s -X POST "https://api.devin.ai/v1/sessions" \
+            -H "Authorization: Bearer $DEVIN_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg name "SonarCloud Quality Gate Remediation - PR #${{ github.event.pull_request.number }}" \
+              --arg repo "${{ github.server_url }}/${{ github.repository }}" \
+              --arg branch "${{ github.head_ref }}" \
+              --arg system_prompt "$SYSTEM_PROMPT" \
+              --arg user_prompt "$USER_PROMPT" \
+              '{
+                name: $name,
+                repo_url: $repo,
+                branch: $branch,
+                system_prompt: $system_prompt,
+                prompt: $user_prompt,
+                mcp_servers: ["sonarqube"]
+              }')")
+          
+          SESSION_ID=$(echo "$DEVIN_SESSION" | jq -r '.session_id')
+          SESSION_URL=$(echo "$DEVIN_SESSION" | jq -r '.url')
+          
+          if [ "$SESSION_ID" == "null" ] || [ -z "$SESSION_ID" ]; then
+            echo "❌ Failed to create Devin session"
+            echo "$DEVIN_SESSION"
+          else
+            echo "✅ Devin session created successfully"
+            echo "   Session ID: $SESSION_ID"
+            echo "   Session URL: $SESSION_URL"
+            
+            cat << EOF > devin-comment.md
+          ## 🤖 Devin AI Quality Gate Remediation Triggered
+          
+          A SonarCloud Quality Gate Remediation Specialist (Devin AI) has been assigned to fix all quality gate failures.
+          
+          ### 📊 Quality Gate Analysis
+          - **Total Issues:** ${TOTAL_ISSUES}
+          - **Vulnerabilities:** ${VULNERABILITIES} 🔴
+          - **Bugs:** ${BUGS} 🐛
+          - **Code Smells:** ${CODE_SMELLS} 💨
+          - **Security Hotspots:** ${SECURITY_HOTSPOTS} 🔥
+          - **Quality Gate Status:** ❌ Failed
+          
+          ### 🔗 Links
+          - [👀 Monitor Devin Session]($SESSION_URL)
+          - [📊 SonarCloud Dashboard](https://sonarcloud.io/dashboard?id=uspto-patent-public-data)
+          - [🔧 GitHub Actions Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          
+          ---
+          
+          **Note:** Devin will push a single comprehensive fix to this branch. The workflow will automatically re-run to validate the quality gate passes.
+          EOF
+            
+            gh pr comment ${{ github.event.pull_request.number }} --body-file devin-comment.md
+          fi
+      
+      - name: Fail if Quality Gate Failed
+        if: steps.quality-gate.outcome == 'failure'
+        run: |
+          if [[ "${{ steps.check-devin.outputs.is_devin_commit }}" == "true" ]]; then
+            echo "❌ Quality gate still failing after Devin remediation"
+            echo "🔍 Human review required"
+          else
+            echo "❌ Quality gate failed"
+            echo "🤖 Devin AI has been triggered to remediate issues"
+          fi
+          exit 1

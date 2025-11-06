@@ -37,7 +37,7 @@ public class SonarUiTrigger {
     }
 
     public Cipher badCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {
-        return Cipher.getInstance("AES/CBC/PKCS5Padding");
+        return Cipher.getInstance("AES/GCM/NoPadding");
     }
 
     public void emptyCatch() {

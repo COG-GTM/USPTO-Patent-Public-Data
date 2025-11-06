@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
 /**
@@ -14,7 +15,9 @@ import java.util.Random;
  */
 public class WorkflowAutostartTest {
     
-    public String hashWithMD5(String input) throws Exception {
+    private final Random random = new Random();
+    
+    public String hashWithMD5(String input) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("MD5");
         byte[] hash = md.digest(input.getBytes());
         StringBuilder result = new StringBuilder();
@@ -27,7 +30,6 @@ public class WorkflowAutostartTest {
     }
     
     public String generateInsecureToken() {
-        Random random = new Random();
         StringBuilder token = new StringBuilder();
         for (int i = 0; i < 32; i++) {
             token.append(Integer.toHexString(random.nextInt(16)));
@@ -36,47 +38,47 @@ public class WorkflowAutostartTest {
     }
     
     public String readFileWithLeak(String filename) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(filename));
-        String line = reader.readLine();
-        return line;
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            return reader.readLine();
+        }
     }
     
     public int complexCalculation(int a, int b, int c, int d, int e, int f) {
         int result = 0;
+        
         if (a > 0) {
-            if (b > 0) {
-                if (c > 0) {
-                    if (d > 0) {
-                        if (e > 0) {
-                            if (f > 0) {
-                                result = a + b + c + d + e + f;
-                            } else {
-                                result = a + b + c + d + e;
-                            }
-                        } else {
-                            result = a + b + c + d;
-                        }
-                    } else {
-                        result = a + b + c;
-                    }
-                } else {
-                    result = a + b;
-                }
-            } else {
-                result = a;
-            }
+            result = a;
         }
+        
+        if (a > 0 && b > 0) {
+            result = a + b;
+        }
+        
+        if (a > 0 && b > 0 && c > 0) {
+            result = a + b + c;
+        }
+        
+        if (a > 0 && b > 0 && c > 0 && d > 0) {
+            result = a + b + c + d;
+        }
+        
+        if (a > 0 && b > 0 && c > 0 && d > 0 && e > 0) {
+            result = a + b + c + d + e;
+        }
+        
+        if (a > 0 && b > 0 && c > 0 && d > 0 && e > 0 && f > 0) {
+            result = a + b + c + d + e + f;
+        }
+        
         return result;
-    }
-    
-    private void neverUsed() {
-        System.out.println("This method is never called");
     }
     
     public void silentFailure() {
         try {
-            int x = 1 / 0;
-        } catch (Exception e) {
+            int result = 1 / 0;
+            System.out.println(result);
+        } catch (ArithmeticException e) {
+            // Intentionally suppressing division by zero for test purposes
         }
     }
 }

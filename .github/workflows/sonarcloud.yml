@@ -284,6 +284,49 @@ jobs:
             * Brief description of major changes
           - **Push to branch:** \`${{ github.head_ref }}\`
           - **This triggers automatic re-scan - DO NOT manually trigger**
+          
+          ### Phase 5: Document Changes in PR Comments (REQUIRED)
+          
+          **CRITICAL:** After pushing your commit, you MUST add a comprehensive comment to PR #${{ github.event.pull_request.number }} documenting all changes made:
+          
+          1. **Create a detailed PR comment** using \`gh pr comment ${{ github.event.pull_request.number }}\` that includes:
+             - Summary of all issues fixed (vulnerabilities, bugs, code smells)
+             - For EACH file modified, list the specific changes made:
+               * File path
+               * Issue type (vulnerability/bug/code smell)
+               * SonarCloud rule ID (e.g., java:S1234)
+               * What was wrong (brief description)
+               * What was fixed (specific change made)
+             - Before/after metrics if available
+             - Any important notes about the fixes
+          
+          2. **Comment format example:**
+          \`\`\`markdown
+          ## 🔧 SonarCloud Remediation Complete
+          
+          Successfully fixed ${VULNERABILITIES} vulnerabilities, ${BUGS} bugs, and ${CODE_SMELLS} code smells.
+          
+          ### Changes Made
+          
+          #### \`path/to/File1.java\`
+          - **[java:S2245] Bug: Insecure Random usage**
+            - Changed \`Random\` to \`SecureRandom\` for security-sensitive token generation
+          - **[java:S2095] Bug: Resource leak**
+            - Wrapped BufferedReader in try-with-resources to ensure proper cleanup
+          
+          #### \`path/to/File2.java\`
+          - **[java:S1541] Code Smell: High cognitive complexity**
+            - Extracted nested conditionals into separate helper methods
+            - Reduced complexity from 18 to 7
+          
+          ### Quality Gate Status
+          - ✅ All vulnerabilities resolved
+          - ✅ All bugs fixed
+          - ✅ Critical code smells addressed
+          - ✅ Tests passing
+          \`\`\`
+          
+          3. **Post the comment immediately after pushing** - do not skip this step
 
           ## Resources
           - 📊 [SonarCloud Dashboard](https://sonarcloud.io/dashboard?id=uspto-patent-public-data)

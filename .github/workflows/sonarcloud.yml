@@ -65,6 +65,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}   # Generate a token on Sonarcloud.io, add it to the secrets of this repo with the name SONAR_TOKEN (Settings > Secrets > Actions > add new repository secret)
         with:
-          # Project configuration is in sonar-project.properties
+          # Explicitly pass project keys to override action defaults
+          args: -Dsonar.projectKey=COG-GTM_USPTO-Patent-Public-Data -Dsonar.organization=cog-gtm
           # When you need the analysis to take place in a directory other than the one from which it was launched, default is .
           projectBaseDir: .

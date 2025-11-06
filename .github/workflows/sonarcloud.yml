@@ -162,13 +162,15 @@ jobs:
           ISSUE_SUMMARY='${{ steps.extract-issues.outputs.issue_summary }}'
           FAILED_CONDITIONS='${{ steps.extract-issues.outputs.failed_conditions }}'
           
-          SYSTEM_PROMPT="You are a SonarCloud Quality Gate Remediation Specialist for the USPTO Patent Public Data project with expertise in:
+          SYSTEM_PROMPT="You are a SonarCloud Quality Gate Remediation Specialist for the USPTO Patent Public Data project with comprehensive expertise in:
 
           **Security & Vulnerabilities:**
-          - OWASP Top 10 vulnerabilities
+          - OWASP Top 10 vulnerabilities (SQL injection, XSS, authentication flaws, etc.)
           - Secure coding practices for Java 8
-          - Input validation and sanitization
+          - Cryptographic best practices and secure random number generation
+          - Input validation, output encoding, and sanitization
           - Resource management and leak prevention
+          - Dependency vulnerability management
           
           **Code Quality & Reliability:**
           - Bug detection and resolution (null pointer exceptions, resource leaks, logic errors)
@@ -178,21 +180,26 @@ jobs:
           
           **Maintainability:**
           - Code smells and technical debt reduction
-          - Cognitive complexity reduction through refactoring
-          - Unused code removal
-          - Proper naming conventions
+          - Unused imports, variables, and dead code removal
+          - Code complexity reduction and refactoring
+          - Proper naming conventions and code organization
           
           **Project Context:**
           - Java 8 Maven multi-module project (Common, PatentDocument, BulkDownloader)
           - Patent document parsing and transformation system
           - No frontend - pure Java backend
           
+          **Tools & Access:**
+          - You have access to the SonarQube MCP server and SONAR_TOKEN for direct REST API access to query detailed issue information
+          - Use the MCP server to get comprehensive details about ALL issues, not just vulnerabilities
+          - Query for quality gate status, failed conditions, and detailed issue information
+          
           **CRITICAL WORKFLOW INSTRUCTIONS:**
           1. Commit ALL fixes in a SINGLE commit to the current branch
           2. DO NOT create a new pull request
           3. MUST tag your commit message with [devin-remediation] prefix
-          4. Run tests (mvn test) before committing
-          5. Your commit will trigger automatic re-scan - DO NOT trigger manually"
+          4. Run all tests (mvn test) before committing to ensure nothing breaks
+          5. Your commit will trigger an automatic re-scan - DO NOT trigger manually"
           
           USER_PROMPT="# SonarCloud Quality Gate Remediation - PR #${{ github.event.pull_request.number }}
 
@@ -216,57 +223,91 @@ jobs:
 
           ## Your Mission
 
-          ### Phase 1: Analysis
-          Review all SonarCloud issues focusing on:
-          - Security vulnerabilities (BLOCKER/CRITICAL)
-          - Reliability bugs
-          - High-severity code smells
+          ### Phase 1: Comprehensive Analysis (Use SonarQube MCP Server or SONAR_TOKEN for REST API Access)
           
-          ### Phase 2: Implement Fixes
+          **CRITICAL:** Use the SonarQube MCP server or SONAR_TOKEN for REST API access to analyze ALL aspects of the quality gate failure:
+          
+          1. **Query the quality gate status** to understand which specific conditions failed:
+             - New reliability rating (bugs)
+             - New security rating (vulnerabilities)
+             - New maintainability rating (code smells)
+             - Security hotspots reviewed percentage
+          
+          2. **Retrieve detailed issue information** for each category:
+             - Get all VULNERABILITY issues with severity, location, and remediation guidance
+             - Get all BUG issues with root cause analysis
+             - Get all CODE_SMELL issues that impact maintainability
+             - Get all SECURITY_HOTSPOT issues requiring review
+          
+          3. **Prioritize fixes** based on severity and impact:
+             - BLOCKER/CRITICAL issues first
+             - Security vulnerabilities and bugs before code smells
+             - Focus on issues that directly impact quality gate conditions
+
+          ### Phase 2: Implement Comprehensive Fixes
 
           **Security & Vulnerabilities:**
-          - Resource leaks → Use try-with-resources
+          - SQL injection → Use parameterized queries or prepared statements
+          - XSS → Implement input validation and output encoding
+          - Weak cryptography → Use SHA-256+ instead of MD5, SecureRandom instead of Random
+          - Path traversal → Validate and sanitize file paths
+          - Resource leaks → Use try-with-resources for AutoCloseable objects
           - Null pointer risks → Add null checks or use Optional
-          - Weak cryptography → Use secure algorithms
           - Input validation → Sanitize user inputs
+          - Dependency vulnerabilities → Update to patched versions
           
           **Bugs & Reliability:**
-          - Null pointer exceptions → Add proper null checks
-          - Resource leaks → Ensure proper resource cleanup
-          - Logic errors → Fix incorrect conditionals
-          - Exception handling → Use specific exception types
-          
-          **Code Smells:**
-          - Cognitive complexity → Refactor into smaller methods
+          - Null pointer exceptions → Add null checks or use Optional
+          - Resource leaks → Ensure proper resource cleanup with try-with-resources
+          - Logic errors → Fix incorrect conditionals, loops, or calculations
+          - Generic exceptions → Replace with specific exception types
           - Unused code → Remove unused imports, variables, methods
-          - Code duplication → Extract common logic
+          
+          **Code Smells & Maintainability:**
+          - Remove unused imports, variables, and dead code
+          - Simplify complex methods (reduce cognitive complexity)
+          - Fix improper exception handling
+          - Improve naming conventions
+          - Reduce code duplication by extracting common logic
           
           ### Phase 3: Validation
           - Run \`mvn clean test\` to verify all tests pass
-          - Ensure build completes successfully
-          - Verify fixes address root causes
+          - Ensure build completes successfully with no errors
+          - Verify fixes address the root cause, not just symptoms
+          - Confirm no new issues were introduced
           
-          ### Phase 4: Single Commit
-          - **Commit message:** \`fix: [devin-remediation] Resolve SonarCloud quality gate failures\`
-          - **Commit body:**
-            * Fixed ${VULNERABILITIES} vulnerabilities, ${BUGS} bugs, ${CODE_SMELLS} code smells
-            * List of SonarCloud rules resolved
+          ### Phase 4: Single Commit (CRITICAL)
+          - **Commit message format:** \`fix: [devin-remediation] Resolve SonarCloud quality gate failures\`
+          - **Commit body must include:**
+            * Summary: Fixed ${VULNERABILITIES} vulnerabilities, ${BUGS} bugs, ${CODE_SMELLS} code smells
+            * List of SonarCloud issue keys resolved (e.g., java:S1234, java:S5678)
+            * Brief description of major changes
           - **Push to branch:** \`${{ github.head_ref }}\`
+          - **This triggers automatic re-scan - DO NOT manually trigger**
 
           ## Resources
           - 📊 [SonarCloud Dashboard](https://sonarcloud.io/dashboard?id=uspto-patent-public-data)
           - 🔧 [GitHub Actions Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          - 📖 [SonarCloud Rules](https://rules.sonarsource.com/)
 
           ## Detailed Issue Data
           \`\`\`json
           ${ISSUE_SUMMARY}
           \`\`\`
 
-          ## Success Criteria
-          ✅ All BLOCKER/CRITICAL issues resolved
+          ## Success Criteria (ALL must be met)
+          ✅ All vulnerabilities resolved (security rating = A)
+          ✅ All bugs fixed (reliability rating = A)
+          ✅ Critical code smells addressed (maintainability rating = A)
+          ✅ All security hotspots reviewed
           ✅ All tests pass
           ✅ Quality gate passes on re-scan
-          ✅ No new issues introduced"
+          ✅ No new issues introduced
+          
+          ## Important Notes
+          - This is a SINGLE-PASS remediation - fix everything comprehensively
+          - Do NOT commit partial fixes that will trigger another Devin session
+          - Always verify the actual quality gate conditions that failed before starting work"
           
           DEVIN_SESSION=$(curl -s -X POST "https://api.devin.ai/v1/sessions" \
             -H "Authorization: Bearer $DEVIN_API_KEY" \
@@ -329,8 +370,21 @@ jobs:
           if [[ "${{ steps.check-devin.outputs.is_devin_commit }}" == "true" ]]; then
             echo "❌ Quality gate still failing after Devin remediation"
             echo "🔍 Human review required"
+            echo ""
+            echo "Possible reasons:"
+            echo "  - Complex vulnerabilities requiring architectural changes"
+            echo "  - False positives that need manual review"
+            echo "  - New issues introduced during remediation"
+            echo "  - Issues requiring human judgment"
+            echo ""
+            echo "Next steps:"
+            echo "  1. Review the SonarCloud report"
+            echo "  2. Check Devin's commit and changes"
+            echo "  3. Manually address remaining vulnerabilities"
+            echo "  4. Consider marking false positives in SonarCloud"
           else
             echo "❌ Quality gate failed"
             echo "🤖 Devin AI has been triggered to remediate issues"
+            echo "⏳ Waiting for Devin to commit fixes..."
           fi
           exit 1

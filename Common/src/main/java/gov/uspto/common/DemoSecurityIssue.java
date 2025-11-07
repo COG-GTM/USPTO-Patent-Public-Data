@@ -1,3 +1,4 @@
+//testing SQ scan
 package gov.uspto.common;
 
 import java.sql.Connection;

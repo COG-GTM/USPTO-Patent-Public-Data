@@ -86,23 +86,43 @@ jobs:
           
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             PR_PARAM="&pullRequest=${{ github.event.pull_request.number }}"
+            PR_PARAM_QUERY="?pullRequest=${{ github.event.pull_request.number }}"
           else
             PR_PARAM=""
+            PR_PARAM_QUERY=""
           fi
           
+          # Query issues API for vulnerabilities, bugs, and code smells
           ALL_ISSUES=$(curl -s -u "${{ secrets.SONAR_TOKEN }}:" \
             "https://sonarcloud.io/api/issues/search?componentKeys=uspto-patent-public-data${PR_PARAM}&resolved=false&severities=BLOCKER,CRITICAL,MAJOR&ps=100")
           
+          # Query hotspots API separately (hotspots are not in issues API)
+          HOTSPOTS_DATA=$(curl -s -u "${{ secrets.SONAR_TOKEN }}:" \
+            "https://sonarcloud.io/api/hotspots/search?projectKey=uspto-patent-public-data${PR_PARAM}&status=TO_REVIEW")
+          
+          # Get quality gate status
           QG_STATUS=$(curl -s -u "${{ secrets.SONAR_TOKEN }}:" \
             "https://sonarcloud.io/api/qualitygates/project_status?projectKey=uspto-patent-public-data${PR_PARAM}")
           
           VULNERABILITIES=$(echo "$ALL_ISSUES" | jq '[.issues[] | select(.type=="VULNERABILITY")] | length')
           BUGS=$(echo "$ALL_ISSUES" | jq '[.issues[] | select(.type=="BUG")] | length')
           CODE_SMELLS=$(echo "$ALL_ISSUES" | jq '[.issues[] | select(.type=="CODE_SMELL")] | length')
-          SECURITY_HOTSPOTS=$(echo "$ALL_ISSUES" | jq '[.issues[] | select(.type=="SECURITY_HOTSPOT")] | length')
+          SECURITY_HOTSPOTS=$(echo "$HOTSPOTS_DATA" | jq '.paging.total // 0')
           TOTAL_ISSUES=$(echo "$ALL_ISSUES" | jq '.total')
           
           FAILED_CONDITIONS=$(echo "$QG_STATUS" | jq -c '[.projectStatus.conditions[] | select(.status=="ERROR") | {metric: .metricKey, actual: .actualValue, threshold: .errorThreshold}]')
+          
+          # Check if failures are ONLY coverage/hotspot-review metrics (not actual code issues)
+          FAILED_METRICS=$(echo "$FAILED_CONDITIONS" | jq -r '.[].metric' | tr '\n' ',')
+          CODE_ISSUE_COUNT=$((VULNERABILITIES + BUGS + CODE_SMELLS))
+          
+          if [[ $CODE_ISSUE_COUNT -eq 0 ]] && [[ "$FAILED_METRICS" =~ ^(new_coverage|new_security_hotspots_reviewed|,)+$ ]]; then
+            echo "is_coverage_only_failure=true" >> $GITHUB_OUTPUT
+            echo "📊 Quality gate failing on coverage/hotspot-review metrics only (no code issues)"
+          else
+            echo "is_coverage_only_failure=false" >> $GITHUB_OUTPUT
+            echo "📊 Quality gate failing on actual code issues"
+          fi
           
           ISSUE_SUMMARY=$(echo "$ALL_ISSUES" | jq -c --arg vuln "$VULNERABILITIES" --arg bugs "$BUGS" --arg smells "$CODE_SMELLS" --arg hotspots "$SECURITY_HOTSPOTS" '{
             total: .total,
@@ -121,6 +141,20 @@ jobs:
             }]
           }')
           
+          # Add hotspots details to summary
+          HOTSPOTS_SUMMARY=$(echo "$HOTSPOTS_DATA" | jq -c '[.hotspots[] | {
+            key: .key,
+            type: "SECURITY_HOTSPOT",
+            severity: .vulnerabilityProbability,
+            message: .message,
+            component: (.component | split(":") | if length > 1 then .[1] else .[0] end),
+            line: .line,
+            rule: .ruleKey,
+            securityCategory: .securityCategory
+          }]')
+          
+          COMBINED_SUMMARY=$(echo "$ISSUE_SUMMARY" | jq -c --argjson hotspots "$HOTSPOTS_SUMMARY" '.hotspots_details = $hotspots')
+          
           echo "total_issues=$TOTAL_ISSUES" >> $GITHUB_OUTPUT
           echo "vulnerabilities=$VULNERABILITIES" >> $GITHUB_OUTPUT
           echo "bugs=$BUGS" >> $GITHUB_OUTPUT
@@ -128,7 +162,7 @@ jobs:
           echo "security_hotspots=$SECURITY_HOTSPOTS" >> $GITHUB_OUTPUT
           
           echo "issue_summary<<EOF" >> $GITHUB_OUTPUT
-          echo "$ISSUE_SUMMARY" >> $GITHUB_OUTPUT
+          echo "$COMBINED_SUMMARY" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
           
           echo "failed_conditions<<EOF" >> $GITHUB_OUTPUT
@@ -140,13 +174,64 @@ jobs:
           echo "   - Vulnerabilities: $VULNERABILITIES"
           echo "   - Bugs: $BUGS"
           echo "   - Code Smells: $CODE_SMELLS"
-          echo "   - Security Hotspots: $SECURITY_HOTSPOTS"
+          echo "   - Security Hotspots (unreviewed): $SECURITY_HOTSPOTS"
+      
+      - name: Post Coverage/Hotspot Review Comment
+        if: |
+          steps.quality-gate.outcome == 'failure' &&
+          steps.extract-issues.outputs.is_coverage_only_failure == 'true' &&
+          steps.check-devin.outputs.is_devin_commit == 'false' &&
+          github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          SECURITY_HOTSPOTS="${{ steps.extract-issues.outputs.security_hotspots }}"
+          FAILED_CONDITIONS='${{ steps.extract-issues.outputs.failed_conditions }}'
+          
+          cat << EOF > coverage-comment.md
+          ## ⚠️ Quality Gate Failed - Coverage/Hotspot Review Required
+          
+          The quality gate is failing on **coverage and/or security hotspot review metrics**, not actual code issues.
+          
+          ### Failed Conditions
+          \`\`\`json
+          ${FAILED_CONDITIONS}
+          \`\`\`
+          
+          ### What This Means
+          - **new_coverage = 0%** (requires ≥80%): No test coverage for new code because tests are skipped with \`-DskipTests\`
+          - **new_security_hotspots_reviewed = 0%** (requires 100%): ${SECURITY_HOTSPOTS} security hotspot(s) need manual review in SonarCloud
+          
+          ### Action Required
+          
+          **Option 1: Add Unit Tests (Recommended for production code)**
+          - Add unit tests for the changed files to achieve ≥80% coverage on new code
+          - Remove \`-DskipTests\` from the Maven build command in the workflow
+          - Ensure tests pass with \`mvn test\`
+          
+          **Option 2: Review Security Hotspots**
+          - Visit the [SonarCloud Dashboard](https://sonarcloud.io/dashboard?id=uspto-patent-public-data)
+          - Review each security hotspot and mark as "Safe" or "Fixed" if appropriate
+          - This requires manual judgment about security context
+          
+          **Option 3: Adjust Quality Gate (For test/demo PRs only)**
+          - If this is a test PR (like the SonarUiTrigger test file), consider:
+            - Closing the PR without merging
+            - Or temporarily adjusting the quality gate rules for this branch
+          
+          ---
+          
+          **Note:** Devin AI was **not** triggered because there are no code issues to fix automatically. Coverage and hotspot review require human judgment or test additions.
+          EOF
+          
+          gh pr comment ${{ github.event.pull_request.number }} --body-file coverage-comment.md
       
       - name: Trigger Devin Remediation (Human PR Only)
         id: trigger-devin
         if: |
           steps.quality-gate.outcome == 'failure' && 
           steps.check-devin.outputs.is_devin_commit == 'false' &&
+          steps.extract-issues.outputs.is_coverage_only_failure == 'false' &&
           github.event_name == 'pull_request'
         env:
           DEVIN_API_KEY: ${{ secrets.DEVIN_API_KEY }}

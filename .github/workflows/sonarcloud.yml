@@ -44,3 +44,250 @@ jobs:
             -Dsonar.projectKey=uspto-patent-public-data \
             -Dsonar.organization=uspto-patent-public-data \
             -Dsonar.host.url=https://sonarcloud.io
+      
+      - name: Wait for SonarCloud analysis
+        run: |
+          echo "⏳ Waiting for SonarCloud analysis to complete..."
+          
+          if [ ! -f target/sonar/report-task.txt ]; then
+            echo "❌ report-task.txt not found"
+            exit 1
+          fi
+          
+          CE_TASK_ID=$(grep ceTaskId target/sonar/report-task.txt | cut -d'=' -f2)
+          echo "CE Task ID: $CE_TASK_ID"
+          
+          MAX_WAIT=300
+          ELAPSED=0
+          while [ $ELAPSED -lt $MAX_WAIT ]; do
+            TASK_STATUS=$(curl -s -u "${{ secrets.SONAR_TOKEN }}:" \
+              "https://sonarcloud.io/api/ce/task?id=$CE_TASK_ID" | jq -r '.task.status')
+            
+            echo "Analysis status: $TASK_STATUS (${ELAPSED}s elapsed)"
+            
+            if [ "$TASK_STATUS" == "SUCCESS" ]; then
+              echo "✅ Analysis completed successfully"
+              break
+            elif [ "$TASK_STATUS" == "FAILED" ] || [ "$TASK_STATUS" == "CANCELED" ]; then
+              echo "❌ Analysis failed or was canceled"
+              exit 1
+            fi
+            
+            sleep 5
+            ELAPSED=$((ELAPSED + 5))
+          done
+          
+          if [ $ELAPSED -ge $MAX_WAIT ]; then
+            echo "⚠️  Analysis timeout after ${MAX_WAIT}s"
+            exit 1
+          fi
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      
+      - name: Check if Devin Remediation Commit
+        id: check-devin
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            git fetch origin ${{ github.head_ref }}
+            COMMIT_AUTHOR=$(git log -1 --format='%an' origin/${{ github.head_ref }})
+            COMMIT_MSG=$(git log -1 --format='%s' origin/${{ github.head_ref }})
+            echo "Checking PR commit - Author: $COMMIT_AUTHOR"
+            echo "Commit message: $COMMIT_MSG"
+          else
+            COMMIT_AUTHOR="${{ github.event.head_commit.author.name }}"
+            COMMIT_MSG="${{ github.event.head_commit.message }}"
+            echo "Checking push commit - Author: $COMMIT_AUTHOR"
+          fi
+          
+          if [[ "$COMMIT_AUTHOR" == "Devin AI" ]] || [[ "$COMMIT_MSG" == *"[devin-remediation]"* ]]; then
+            echo "is_devin_commit=true" >> $GITHUB_OUTPUT
+            echo "🤖 Detected Devin remediation commit - skipping new session trigger"
+          else
+            echo "is_devin_commit=false" >> $GITHUB_OUTPUT
+            echo "👤 Human commit detected"
+          fi
+      
+      - name: Collect Sonar Issue Summary
+        id: extract-issues
+        run: |
+          echo "📊 Collecting SonarCloud issue summary..."
+          
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            PR_PARAM="&pullRequest=${{ github.event.pull_request.number }}"
+          else
+            PR_PARAM=""
+          fi
+          
+          ALL_ISSUES=$(curl -s -u "${{ secrets.SONAR_TOKEN }}:" \
+            "https://sonarcloud.io/api/issues/search?componentKeys=uspto-patent-public-data${PR_PARAM}&resolved=false&severities=BLOCKER,CRITICAL,MAJOR&ps=100")
+          
+          HOTSPOTS_DATA=$(curl -s -u "${{ secrets.SONAR_TOKEN }}:" \
+            "https://sonarcloud.io/api/hotspots/search?projectKey=uspto-patent-public-data${PR_PARAM}&status=TO_REVIEW")
+          
+          VULNERABILITIES=$(echo "$ALL_ISSUES" | jq '[.issues[] | select(.type=="VULNERABILITY")] | length')
+          BUGS=$(echo "$ALL_ISSUES" | jq '[.issues[] | select(.type=="BUG")] | length')
+          CODE_SMELLS=$(echo "$ALL_ISSUES" | jq '[.issues[] | select(.type=="CODE_SMELL")] | length')
+          SECURITY_HOTSPOTS=$(echo "$HOTSPOTS_DATA" | jq '.paging.total // 0')
+          TOTAL_ISSUES=$(echo "$ALL_ISSUES" | jq '.total')
+          
+          CODE_ISSUE_COUNT=$((VULNERABILITIES + BUGS + CODE_SMELLS))
+          
+          if [ $CODE_ISSUE_COUNT -gt 0 ]; then
+            echo "has_code_issues=true" >> $GITHUB_OUTPUT
+            echo "📊 Found $CODE_ISSUE_COUNT code issues (Vulnerabilities: $VULNERABILITIES, Bugs: $BUGS, Code Smells: $CODE_SMELLS)"
+          else
+            echo "has_code_issues=false" >> $GITHUB_OUTPUT
+            echo "✅ No code issues found"
+          fi
+          
+          ISSUE_SUMMARY=$(echo "$ALL_ISSUES" | jq -c --arg vuln "$VULNERABILITIES" --arg bugs "$BUGS" --arg smells "$CODE_SMELLS" --arg hotspots "$SECURITY_HOTSPOTS" '{
+            total: .total,
+            vulnerabilities: ($vuln | tonumber),
+            bugs: ($bugs | tonumber),
+            code_smells: ($smells | tonumber),
+            security_hotspots: ($hotspots | tonumber),
+            issues: [.issues[] | {
+              key: .key,
+              type: .type,
+              severity: .severity,
+              message: .message,
+              component: (.component | split(":") | if length > 1 then .[1] else .[0] end),
+              line: .line,
+              rule: .rule
+            }]
+          }')
+          
+          HOTSPOTS_SUMMARY=$(echo "$HOTSPOTS_DATA" | jq -c '[.hotspots[] | {
+            key: .key,
+            type: "SECURITY_HOTSPOT",
+            severity: .vulnerabilityProbability,
+            message: .message,
+            component: (.component | split(":") | if length > 1 then .[1] else .[0] end),
+            line: .line,
+            rule: .ruleKey,
+            securityCategory: .securityCategory
+          }]')
+          
+          COMBINED_SUMMARY=$(echo "$ISSUE_SUMMARY" | jq -c --argjson hotspots "$HOTSPOTS_SUMMARY" '.hotspots_details = $hotspots')
+          
+          echo "total_issues=$TOTAL_ISSUES" >> $GITHUB_OUTPUT
+          echo "vulnerabilities=$VULNERABILITIES" >> $GITHUB_OUTPUT
+          echo "bugs=$BUGS" >> $GITHUB_OUTPUT
+          echo "code_smells=$CODE_SMELLS" >> $GITHUB_OUTPUT
+          echo "security_hotspots=$SECURITY_HOTSPOTS" >> $GITHUB_OUTPUT
+          
+          echo "issue_summary<<EOF" >> $GITHUB_OUTPUT
+          echo "$COMBINED_SUMMARY" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      
+      - name: Trigger Devin Remediation
+        id: trigger-devin
+        if: |
+          github.event_name == 'pull_request' &&
+          steps.check-devin.outputs.is_devin_commit == 'false' &&
+          steps.extract-issues.outputs.has_code_issues == 'true'
+        env:
+          DEVIN_API_KEY: ${{ secrets.DEVIN_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🤖 Triggering Devin AI Quality Gate Remediation Specialist..."
+          
+          TOTAL_ISSUES="${{ steps.extract-issues.outputs.total_issues }}"
+          VULNERABILITIES="${{ steps.extract-issues.outputs.vulnerabilities }}"
+          BUGS="${{ steps.extract-issues.outputs.bugs }}"
+          CODE_SMELLS="${{ steps.extract-issues.outputs.code_smells }}"
+          SECURITY_HOTSPOTS="${{ steps.extract-issues.outputs.security_hotspots }}"
+          ISSUE_SUMMARY='${{ steps.extract-issues.outputs.issue_summary }}'
+          
+          SYSTEM_PROMPT="You are a SonarCloud Quality Gate Remediation Specialist. Fix all security vulnerabilities, bugs, and code smells in this Java 8 Maven project.
+
+          **Critical Instructions:**
+          1. Use SonarQube MCP server or SONAR_TOKEN REST API to get detailed issue information
+          2. Fix all issues comprehensively in a SINGLE commit
+          3. Run mvn test before committing
+          4. Tag commit with [devin-remediation] prefix
+          5. DO NOT create a new PR - push to current branch only"
+          
+          USER_PROMPT="# SonarCloud Issue Remediation - PR #${{ github.event.pull_request.number }}
+
+          ## Issue Summary
+          - **Total Issues:** ${TOTAL_ISSUES}
+          - **Vulnerabilities:** ${VULNERABILITIES} 🔴
+          - **Bugs:** ${BUGS} 🐛
+          - **Code Smells:** ${CODE_SMELLS} 💨
+          - **Security Hotspots:** ${SECURITY_HOTSPOTS} 🔥
+          - **Project:** uspto-patent-public-data
+          - **Branch:** ${{ github.head_ref }}
+          - **PR:** #${{ github.event.pull_request.number }}
+
+          ## Detailed Issue Data
+          \`\`\`json
+          ${ISSUE_SUMMARY}
+          \`\`\`
+
+          ## Resources
+          - 📊 [SonarCloud Dashboard](https://sonarcloud.io/dashboard?id=uspto-patent-public-data)
+          - 🔧 [GitHub Actions Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+          ## Instructions
+          1. Query SonarCloud API for detailed issue information
+          2. Fix all vulnerabilities, bugs, and code smells
+          3. Run mvn test to verify fixes
+          4. Commit with message: \`fix: [devin-remediation] Resolve SonarCloud issues\`
+          5. Push to branch: \`${{ github.head_ref }}\`"
+          
+          DEVIN_SESSION=$(curl -s -X POST "https://api.devin.ai/v1/sessions" \
+            -H "Authorization: Bearer $DEVIN_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg name "SonarCloud Issue Remediation - PR #${{ github.event.pull_request.number }}" \
+              --arg repo "${{ github.server_url }}/${{ github.repository }}" \
+              --arg branch "${{ github.head_ref }}" \
+              --arg system_prompt "$SYSTEM_PROMPT" \
+              --arg user_prompt "$USER_PROMPT" \
+              '{
+                name: $name,
+                repo_url: $repo,
+                branch: $branch,
+                system_prompt: $system_prompt,
+                prompt: $user_prompt,
+                mcp_servers: ["sonarqube"]
+              }')")
+          
+          SESSION_ID=$(echo "$DEVIN_SESSION" | jq -r '.session_id')
+          SESSION_URL=$(echo "$DEVIN_SESSION" | jq -r '.url')
+          
+          if [ "$SESSION_ID" == "null" ] || [ -z "$SESSION_ID" ]; then
+            echo "❌ Failed to create Devin session"
+            echo "$DEVIN_SESSION"
+          else
+            echo "✅ Devin session created successfully"
+            echo "   Session ID: $SESSION_ID"
+            echo "   Session URL: $SESSION_URL"
+            
+            cat << EOF > devin-comment.md
+          ## 🤖 Devin AI Remediation Triggered
+          
+          A SonarCloud Remediation Specialist (Devin AI) has been assigned to fix the issues found in this PR.
+          
+          ### 📊 Issue Summary
+          - **Total Issues:** ${TOTAL_ISSUES}
+          - **Vulnerabilities:** ${VULNERABILITIES} 🔴
+          - **Bugs:** ${BUGS} 🐛
+          - **Code Smells:** ${CODE_SMELLS} 💨
+          - **Security Hotspots:** ${SECURITY_HOTSPOTS} 🔥
+          
+          ### 🔗 Links
+          - [👀 Monitor Devin Session]($SESSION_URL)
+          - [📊 SonarCloud Dashboard](https://sonarcloud.io/dashboard?id=uspto-patent-public-data)
+          - [🔧 GitHub Actions Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          
+          ---
+          
+          **Note:** Devin will push a fix to this branch. The workflow will automatically re-run after the commit.
+          EOF
+            
+            gh pr comment ${{ github.event.pull_request.number }} --body-file devin-comment.md
+          fi

@@ -4,7 +4,7 @@ package gov.uspto.common;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Random;
+import java.security.SecureRandom;
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 
@@ -14,10 +14,10 @@ import javax.crypto.NoSuchPaddingException;
  */
 public class SonarUiTrigger {
     public static final String EDIT_ME = "change-me";
-    private final Random random = new Random();
+    private final SecureRandom random = new SecureRandom();
 
     public String insecureMd5(String input) throws NoSuchAlgorithmException {
-        MessageDigest md = MessageDigest.getInstance("MD5"); // Sonar: weak crypto
+        MessageDigest md = MessageDigest.getInstance("SHA-256"); // Fixed: use SHA-256 instead of MD5
         byte[] digest = md.digest(input.getBytes());
         StringBuilder sb = new StringBuilder();
         for (byte b : digest) {

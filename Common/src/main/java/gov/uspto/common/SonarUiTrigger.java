@@ -1,4 +1,4 @@
-//TEST SQ SCAN_1
+//TEST SQ SCAN_2
 
 package gov.uspto.common;
 

@@ -30,6 +30,8 @@ public class AuthenticationConfig {
     private boolean requirePasswordComplexity = true;
     private int tokenExpirationMinutes = 60;
     private boolean enableAuditLogging = true;
+    private boolean fipsEnabled = false;
+    private int pbkdf2Iterations = 310000;
 
     /**
      * Creates a default authentication configuration.
@@ -90,6 +92,8 @@ public class AuthenticationConfig {
         requirePasswordComplexity = getBooleanProperty(props, "auth.password.require.complexity", requirePasswordComplexity);
         tokenExpirationMinutes = getIntProperty(props, "auth.token.expiration.minutes", tokenExpirationMinutes);
         enableAuditLogging = getBooleanProperty(props, "auth.audit.logging.enabled", enableAuditLogging);
+        fipsEnabled = getBooleanProperty(props, "auth.fips.enabled", fipsEnabled);
+        pbkdf2Iterations = getIntProperty(props, "auth.pbkdf2.iterations", pbkdf2Iterations);
     }
 
     /**
@@ -188,6 +192,22 @@ public class AuthenticationConfig {
         this.enableAuditLogging = enableAuditLogging;
     }
 
+    public boolean isFipsEnabled() {
+        return fipsEnabled;
+    }
+
+    public void setFipsEnabled(boolean fipsEnabled) {
+        this.fipsEnabled = fipsEnabled;
+    }
+
+    public int getPbkdf2Iterations() {
+        return pbkdf2Iterations;
+    }
+
+    public void setPbkdf2Iterations(int pbkdf2Iterations) {
+        this.pbkdf2Iterations = pbkdf2Iterations;
+    }
+
     @Override
     public String toString() {
         return "AuthenticationConfig{" +
@@ -199,6 +219,8 @@ public class AuthenticationConfig {
                 ", requirePasswordComplexity=" + requirePasswordComplexity +
                 ", tokenExpirationMinutes=" + tokenExpirationMinutes +
                 ", enableAuditLogging=" + enableAuditLogging +
+                ", fipsEnabled=" + fipsEnabled +
+                ", pbkdf2Iterations=" + pbkdf2Iterations +
                 '}';
     }
 }

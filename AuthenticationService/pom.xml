@@ -64,6 +64,20 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- BouncyCastle FIPS for PKI/certificate operations (FIPS 140-2 validated, FedRAMP compliant) -->
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bc-fips</artifactId>
+			<version>1.0.2.5</version>
+		</dependency>
+
+		<!-- BouncyCastle PKIX FIPS for X.509 certificate handling -->
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcpkix-fips</artifactId>
+			<version>1.0.7</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

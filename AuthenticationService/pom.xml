@@ -64,6 +64,13 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- BouncyCastle for PKI/certificate operations (NIST 800-53 IA-5(2) compliance) -->
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk15on</artifactId>
+			<version>1.70</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

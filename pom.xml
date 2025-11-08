@@ -11,6 +11,7 @@
 		<module>BulkDownloader</module>
 		<module>PatentDocument</module>
         <module>Common</module>
+        <module>AuthenticationService</module>
 	</modules>
 
 	<packaging>pom</packaging>

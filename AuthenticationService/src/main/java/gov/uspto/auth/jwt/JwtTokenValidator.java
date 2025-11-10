@@ -26,13 +26,13 @@ public class JwtTokenValidator {
      */
     public Principal validateToken(String token) throws AuthenticationException {
         if (token == null || token.isEmpty()) {
-            throw new AuthenticationException("Token cannot be null or empty");
+            throw new AuthenticationException(AuthenticationException.ERROR_INVALID_TOKEN, "Token cannot be null or empty");
         }
         
         try {
             String[] parts = token.split("\\.");
             if (parts.length != 3) {
-                throw new AuthenticationException("Invalid token format");
+                throw new AuthenticationException(AuthenticationException.ERROR_INVALID_TOKEN, "Invalid token format");
             }
             
             String payload = new String(Base64.getDecoder().decode(parts[1]));
@@ -42,16 +42,21 @@ public class JwtTokenValidator {
             Long expiration = (Long) claims.get("exp");
             
             if (expiration != null && expiration < System.currentTimeMillis()) {
-                throw new AuthenticationException("Token has expired");
+                throw new AuthenticationException(AuthenticationException.ERROR_TOKEN_EXPIRED, "Token has expired");
             }
             
-            Principal principal = new Principal();
-            principal.setUsername(username);
+            Principal principal = new Principal.Builder()
+                .identifier(username)
+                .name(username)
+                .authenticationType("jwt")
+                .build();
             
             return principal;
             
+        } catch (AuthenticationException e) {
+            throw e;
         } catch (Exception e) {
-            throw new AuthenticationException("Token validation failed: " + e.getMessage());
+            throw new AuthenticationException(AuthenticationException.ERROR_INVALID_TOKEN, "Token validation failed: " + e.getMessage(), e);
         }
     }
     

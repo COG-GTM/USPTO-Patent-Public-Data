@@ -211,6 +211,8 @@ public class MathML {
 
     public static MathML read(Reader reader) throws SAXException, DocumentException{        
         SAXReader sax = new SAXReader(false);
+        sax.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        sax.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
         sax.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
         Document document = sax.read(reader);
 

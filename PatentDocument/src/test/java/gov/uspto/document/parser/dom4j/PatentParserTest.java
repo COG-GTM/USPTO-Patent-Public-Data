@@ -17,7 +17,8 @@ public class PatentParserTest {
 
         PatentReader patentReader = new PatentReader(PatentDocFormat.RedbookApplication);
         try (StringReader rawText = new StringReader(xmlString)) {
-            patentReader.read(rawText);
+            gov.uspto.patent.model.Patent patent = patentReader.read(rawText);
+            org.junit.Assert.assertNotNull("Patent should not be null", patent);
         }
     }
 
@@ -27,7 +28,8 @@ public class PatentParserTest {
         
         PatentReader patentReader = new PatentReader(PatentDocFormat.RedbookGrant);
         try (StringReader rawText = new StringReader(xmlString)) {
-            patentReader.read(rawText);
+            gov.uspto.patent.model.Patent patent = patentReader.read(rawText);
+            org.junit.Assert.assertNotNull("Patent should not be null", patent);
         }        
     }
 
@@ -37,7 +39,8 @@ public class PatentParserTest {
 
         PatentReader patentReader = new PatentReader(PatentDocFormat.Sgml);
         try (StringReader rawText = new StringReader(xmlString)) {
-            patentReader.read(rawText);
+            gov.uspto.patent.model.Patent patent = patentReader.read(rawText);
+            org.junit.Assert.assertNotNull("Patent should not be null", patent);
         }
     }
 
@@ -47,7 +50,8 @@ public class PatentParserTest {
 
         PatentReader patentReader = new PatentReader(PatentDocFormat.Pap);
         try (StringReader rawText = new StringReader(xmlString)) {
-            patentReader.read(rawText);
+            gov.uspto.patent.model.Patent patent = patentReader.read(rawText);
+            org.junit.Assert.assertNotNull("Patent should not be null", patent);
         }
     }
 
@@ -57,8 +61,9 @@ public class PatentParserTest {
 
         PatentReader patentReader = new PatentReader(PatentDocFormat.Greenbook);
         try (StringReader rawText = new StringReader(xmlString)) {
-            patentReader.read(rawText);
+            gov.uspto.patent.model.Patent patent = patentReader.read(rawText);
+            org.junit.Assert.assertNotNull("Patent should not be null", patent);
+            org.junit.Assert.assertEquals("Patent ID should match (normalized without leading zeros)", "3930584", patent.getDocumentId().getDocNumber());
         }
-        // (patent.getDocumentId(), "039305848");
     }
 }

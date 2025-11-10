@@ -268,34 +268,6 @@ public class Look {
 
         FileFilterChain filters = new FileFilterChain();
 
-        DumpReader dumpReader;
-        if (aps) {
-            dumpReader = new DumpFileAps(inputFile);
-            //filter.addRule(new SuffixFileFilter("txt"));
-        } else {
-            PatentDocFormat patentDocFormat = new PatentDocFormatDetect().fromFileName(inputFile);
-            switch (patentDocFormat) {
-            case Greenbook:
-                aps = true;
-                dumpReader = new DumpFileAps(inputFile);
-                //filters.addRule(new PathFileFilter(""));
-                //filters.addRule(new SuffixFilter("txt"));
-                break;
-            default:
-                DumpFileXml dumpXml = new DumpFileXml(inputFile);
-    			if (PatentDocFormat.Pap.equals(patentDocFormat) || addHtmlEntities) {
-    				dumpXml.addHTMLEntities();
-    			}
-                dumpReader = dumpXml;
-                filters.addRule(new SuffixFileFilter("xml"));
-            }
-        }
-
-        dumpReader.setFileFilter(filters);
-
-        dumpReader.open();
-        dumpReader.skip(skip);
-
         Writer writer = null;
         if (options.has("out")) {
             String outStr = (String) options.valueOf("out");
@@ -306,16 +278,67 @@ public class Look {
             writer = new BufferedWriter(new OutputStreamWriter(System.out, Charset.forName("UTF-8")));
         }
 
-        try {
-            if (options.has("id")) {
-                String docid = (String) options.valueOf("id");
-                look.look(dumpReader, docid, writer, fields);
-            } else {
-                look.look(dumpReader, limit, writer, fields);
+        if (aps) {
+            try (DumpFileAps dumpReader = new DumpFileAps(inputFile)) {
+                dumpReader.setFileFilter(filters);
+                dumpReader.open();
+                dumpReader.skip(skip);
+
+                try {
+                    if (options.has("id")) {
+                        String docid = (String) options.valueOf("id");
+                        look.look(dumpReader, docid, writer, fields);
+                    } else {
+                        look.look(dumpReader, limit, writer, fields);
+                    }
+                } finally {
+                    writer.close();
+                }
             }
-        } finally {
-            dumpReader.close();
-            writer.close();
+        } else {
+            PatentDocFormat patentDocFormat = new PatentDocFormatDetect().fromFileName(inputFile);
+            switch (patentDocFormat) {
+            case Greenbook:
+                aps = true;
+                try (DumpFileAps dumpReader = new DumpFileAps(inputFile)) {
+                    dumpReader.setFileFilter(filters);
+                    dumpReader.open();
+                    dumpReader.skip(skip);
+
+                    try {
+                        if (options.has("id")) {
+                            String docid = (String) options.valueOf("id");
+                            look.look(dumpReader, docid, writer, fields);
+                        } else {
+                            look.look(dumpReader, limit, writer, fields);
+                        }
+                    } finally {
+                        writer.close();
+                    }
+                }
+                break;
+            default:
+                try (DumpFileXml dumpReader = new DumpFileXml(inputFile)) {
+                    if (PatentDocFormat.Pap.equals(patentDocFormat) || addHtmlEntities) {
+                        dumpReader.addHTMLEntities();
+                    }
+                    filters.addRule(new SuffixFileFilter("xml"));
+                    dumpReader.setFileFilter(filters);
+                    dumpReader.open();
+                    dumpReader.skip(skip);
+
+                    try {
+                        if (options.has("id")) {
+                            String docid = (String) options.valueOf("id");
+                            look.look(dumpReader, docid, writer, fields);
+                        } else {
+                            look.look(dumpReader, limit, writer, fields);
+                        }
+                    } finally {
+                        writer.close();
+                    }
+                }
+            }
         }
 
         System.out.println("--- Finished ---");

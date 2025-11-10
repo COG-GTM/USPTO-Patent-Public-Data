@@ -64,6 +64,8 @@ public abstract class Dom4JParser implements Dom4j {
 	public Patent parse(InputStream inputStream) throws PatentReaderException {
 		try {
 			SAXReader sax = new SAXReader(false);
+			sax.setFeature("http://xml.org/sax/features/external-general-entities", false);
+			sax.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
 			sax.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 			Document document = sax.read(inputStream);
 			return parse(document);
@@ -82,6 +84,8 @@ public abstract class Dom4JParser implements Dom4j {
 	public Patent parse(Reader reader) throws PatentReaderException {
 		try {
 			SAXReader sax = new SAXReader(false);
+			sax.setFeature("http://xml.org/sax/features/external-general-entities", false);
+			sax.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
 			sax.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 			return parse(sax.read(reader));
 		} catch (DocumentException | SAXException e) {
@@ -111,6 +115,8 @@ public abstract class Dom4JParser implements Dom4j {
         doc = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n" + doc; 
 		try {
 			SAXReader sax = new SAXReader(false);
+			sax.setFeature("http://xml.org/sax/features/external-general-entities", false);
+			sax.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
 			sax.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 			return sax.read(new StringReader(doc));
 		} catch (DocumentException | SAXException e) {

@@ -59,7 +59,7 @@ public class TransformerCli {
 
 	private final DocumentBuilder<Patent> fileBuilder;
 	private Path outputDir;
-	private boolean stdout = false;
+	private boolean stdoutEnabled = false;
 	private boolean insertHtmlEntities = false;
 	private boolean outputBulkFile;
 	private File inputFile;
@@ -77,7 +77,7 @@ public class TransformerCli {
 
 	public TransformerCli(DocumentBuilder<Patent> fileBuilder) {
 		this.fileBuilder = fileBuilder;
-		this.stdout = true;
+		this.stdoutEnabled = true;
 	}
 
 	/**
@@ -187,7 +187,7 @@ public class TransformerCli {
 					String patentId = patent.getDocumentId() != null ? patent.getDocumentId().toText() : "";
 					MDC.put("DOCID", patentId);
 
-					if (!stdout && !outputBulkFile || outputBulkFile && currentWriter == null) {
+					if (!stdoutEnabled && !outputBulkFile || outputBulkFile && currentWriter == null) {
 						if (!outputBulkFile) {
 							currentFileName = patentId + ".json";
 							if (currentWriter != null) {
@@ -224,7 +224,7 @@ public class TransformerCli {
 		fileBuilder.write(patent, writer);
 		if (outputBulkFile) {
 			writer.write("\n");
-		} else if (stdout) {
+		} else if (stdoutEnabled) {
 			//System.out.println("JSON: " + writer.toString());
 			STDOUT.println("JSON: " + writer.toString());
 		}

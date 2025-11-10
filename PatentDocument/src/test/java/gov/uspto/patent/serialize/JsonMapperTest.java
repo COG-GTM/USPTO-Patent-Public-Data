@@ -57,6 +57,10 @@ public class JsonMapperTest {
         //System.out.println(jsonObj.toString());
 
         //System.out.println(json.getPrettyPrint(jsonObj));
+        
+        org.junit.Assert.assertNotNull("JSON object should not be null", jsonObj);
+        org.junit.Assert.assertTrue("JSON should contain documentId", jsonObj.containsKey("documentId"));
+        org.junit.Assert.assertTrue("JSON should contain title", jsonObj.containsKey("title"));
     }
     
 }

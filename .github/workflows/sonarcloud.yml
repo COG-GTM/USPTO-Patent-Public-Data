@@ -86,16 +86,21 @@ jobs:
       
       - name: Check if Devin Remediation Commit
         id: check-devin
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          HEAD_REF: ${{ github.head_ref }}
+          COMMIT_AUTHOR_NAME: ${{ github.event.head_commit.author.name }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
         run: |
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            git fetch origin ${{ github.head_ref }}
-            COMMIT_AUTHOR=$(git log -1 --format='%an' origin/${{ github.head_ref }})
-            COMMIT_MSG=$(git log -1 --format='%s' origin/${{ github.head_ref }})
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            git fetch origin "$HEAD_REF"
+            COMMIT_AUTHOR=$(git log -1 --format='%an' "origin/$HEAD_REF")
+            COMMIT_MSG=$(git log -1 --format='%s' "origin/$HEAD_REF")
             echo "Checking PR commit - Author: $COMMIT_AUTHOR"
             echo "Commit message: $COMMIT_MSG"
           else
-            COMMIT_AUTHOR="${{ github.event.head_commit.author.name }}"
-            COMMIT_MSG="${{ github.event.head_commit.message }}"
+            COMMIT_AUTHOR="$COMMIT_AUTHOR_NAME"
+            COMMIT_MSG="$COMMIT_MESSAGE"
             echo "Checking push commit - Author: $COMMIT_AUTHOR"
           fi
           
@@ -109,11 +114,14 @@ jobs:
       
       - name: Collect Sonar Issue Summary
         id: extract-issues
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           echo "📊 Collecting SonarCloud issue summary..."
           
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            PR_PARAM="&pullRequest=${{ github.event.pull_request.number }}"
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            PR_PARAM="&pullRequest=$PR_NUMBER"
           else
             PR_PARAM=""
           fi
@@ -191,6 +199,11 @@ jobs:
         env:
           DEVIN_API_KEY: ${{ secrets.DEVIN_API_KEY }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_REF: ${{ github.head_ref }}
+          GITHUB_SERVER_URL: ${{ github.server_url }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
         run: |
           echo "🤖 Triggering Devin AI Quality Gate Remediation Specialist..."
           
@@ -210,7 +223,7 @@ jobs:
           4. Tag commit with [devin-remediation] prefix
           5. DO NOT create a new PR - push to current branch only"
           
-          USER_PROMPT="# SonarCloud Issue Remediation - PR #${{ github.event.pull_request.number }}
+          USER_PROMPT="# SonarCloud Issue Remediation - PR #${PR_NUMBER}
 
           ## Issue Summary
           - **Total Issues:** ${TOTAL_ISSUES}
@@ -219,8 +232,8 @@ jobs:
           - **Code Smells:** ${CODE_SMELLS} 💨
           - **Security Hotspots:** ${SECURITY_HOTSPOTS} 🔥
           - **Project:** uspto-patent-public-data
-          - **Branch:** ${{ github.head_ref }}
-          - **PR:** #${{ github.event.pull_request.number }}
+          - **Branch:** ${HEAD_REF}
+          - **PR:** #${PR_NUMBER}
 
           ## Detailed Issue Data
           \`\`\`json
@@ -229,22 +242,22 @@ jobs:
 
           ## Resources
           - 📊 [SonarCloud Dashboard](https://sonarcloud.io/dashboard?id=uspto-patent-public-data)
-          - 🔧 [GitHub Actions Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          - 🔧 [GitHub Actions Run](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})
 
           ## Instructions
           1. Query SonarCloud API for detailed issue information
           2. Fix all vulnerabilities, bugs, and code smells
           3. Run mvn test to verify fixes
           4. Commit with message: \`fix: [devin-remediation] Resolve SonarCloud issues\`
-          5. Push to branch: \`${{ github.head_ref }}\`"
+          5. Push to branch: \`${HEAD_REF}\`"
           
           DEVIN_SESSION=$(curl -s -X POST "https://api.devin.ai/v1/sessions" \
             -H "Authorization: Bearer $DEVIN_API_KEY" \
             -H "Content-Type: application/json" \
             -d "$(jq -n \
-              --arg name "SonarCloud Issue Remediation - PR #${{ github.event.pull_request.number }}" \
-              --arg repo "${{ github.server_url }}/${{ github.repository }}" \
-              --arg branch "${{ github.head_ref }}" \
+              --arg name "SonarCloud Issue Remediation - PR #${PR_NUMBER}" \
+              --arg repo "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
+              --arg branch "${HEAD_REF}" \
               --arg system_prompt "$SYSTEM_PROMPT" \
               --arg user_prompt "$USER_PROMPT" \
               '{
@@ -282,12 +295,12 @@ jobs:
           ### 🔗 Links
           - [👀 Monitor Devin Session]($SESSION_URL)
           - [📊 SonarCloud Dashboard](https://sonarcloud.io/dashboard?id=uspto-patent-public-data)
-          - [🔧 GitHub Actions Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          - [🔧 GitHub Actions Run](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})
           
           ---
           
           **Note:** Devin will push a fix to this branch. The workflow will automatically re-run after the commit.
           EOF
             
-            gh pr comment ${{ github.event.pull_request.number }} --body-file devin-comment.md
+            gh pr comment ${PR_NUMBER} --body-file devin-comment.md
           fi

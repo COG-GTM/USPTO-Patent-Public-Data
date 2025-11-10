@@ -182,40 +182,56 @@ public class ExtractPatent {
 		
         FileFilterChain filters = new FileFilterChain();
 
-        DumpReader dumpReader;
         if (aps) {
-            dumpReader = new DumpFileAps(inputFile);
-            //filter.addRule(new SuffixFileFilter("txt"));
+            try (DumpFileAps dumpReader = new DumpFileAps(inputFile)) {
+                dumpReader.setFileFilter(filters);
+                dumpReader.open();
+                dumpReader.skip(skip);
+
+                if (options.has("id")) {
+                    String docid = (String) options.valueOf("id");
+                    extract.run(dumpReader, docid, outdir, aps);
+                } else {
+                    extract.run(dumpReader, limit, outdir, aps);
+                }
+            }
         } else {
             PatentDocFormat patentDocFormat = new PatentDocFormatDetect().fromFileName(inputFile);
             switch (patentDocFormat) {
             case Greenbook:
                 aps = true;
-                dumpReader = new DumpFileAps(inputFile);
-                //filters.addRule(new PathFileFilter(""));
-                //filters.addRule(new SuffixFilter("txt"));
+                try (DumpFileAps dumpReader = new DumpFileAps(inputFile)) {
+                    dumpReader.setFileFilter(filters);
+                    dumpReader.open();
+                    dumpReader.skip(skip);
+
+                    if (options.has("id")) {
+                        String docid = (String) options.valueOf("id");
+                        extract.run(dumpReader, docid, outdir, aps);
+                    } else {
+                        extract.run(dumpReader, limit, outdir, aps);
+                    }
+                }
                 break;
             default:
-                DumpFileXml dumpXml = new DumpFileXml(inputFile);
-    			if (PatentDocFormat.Pap.equals(patentDocFormat) || addHtmlEntities) {
-    				dumpXml.addHTMLEntities();
-    			}
-                dumpReader = dumpXml;
-                filters.addRule(new SuffixFileFilter("xml"));
+                try (DumpFileXml dumpReader = new DumpFileXml(inputFile)) {
+                    if (PatentDocFormat.Pap.equals(patentDocFormat) || addHtmlEntities) {
+                        dumpReader.addHTMLEntities();
+                    }
+                    filters.addRule(new SuffixFileFilter("xml"));
+                    dumpReader.setFileFilter(filters);
+                    dumpReader.open();
+                    dumpReader.skip(skip);
+
+                    if (options.has("id")) {
+                        String docid = (String) options.valueOf("id");
+                        extract.run(dumpReader, docid, outdir, aps);
+                    } else {
+                        extract.run(dumpReader, limit, outdir, aps);
+                    }
+                }
             }
         }
-
-        dumpReader.setFileFilter(filters);
-
-		dumpReader.open();
-		dumpReader.skip(skip);
-
-		if (options.has("id")) {
-			String docid = (String) options.valueOf("id");
-			extract.run(dumpReader, docid, outdir, aps);
-		} else {
-			extract.run(dumpReader, limit, outdir, aps);
-		}
 
 		System.out.println("--- Finished ---");
 

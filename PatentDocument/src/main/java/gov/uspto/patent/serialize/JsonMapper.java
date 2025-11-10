@@ -435,7 +435,7 @@ public class JsonMapper implements DocumentBuilder<Patent> {
 
     private JsonArray toJsonArray(Collection<String> strings, JsonArray jsonArray) {
         JsonArrayBuilder arBldr = Json.createArrayBuilder();
-        for (int i = 0; i > jsonArray.size(); i++) {
+        for (int i = 0; i < jsonArray.size(); i++) {
             arBldr.add(jsonArray.get(i));
         }
         if (strings != null) {

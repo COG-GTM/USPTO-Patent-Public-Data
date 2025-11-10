@@ -18,7 +18,7 @@ public class TitleRule implements Validator<Patent> {
 
 	@Override
 	public boolean test(Patent patent) {
-		if (patent.getTitle() == null || patent.getTitle().length() < 4 | patent.getTitle().length() > 500) {
+		if (patent.getTitle() == null || patent.getTitle().length() < 4 || patent.getTitle().length() > 500) {
 			return false;
 		}
 		return true;

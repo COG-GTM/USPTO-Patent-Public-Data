@@ -48,7 +48,8 @@ public class FormattedTextCustomizeTest {
         String expect = expectStb.toString();
 
         String actual = format.getPlainText(stb.toString(), new FreetextConfig());
-        //assertEquals(expect, actual);
+        assertNotNull("Plain text output should not be null", actual);
+        assertTrue("Plain text should contain SECTION TITLE", actual.contains("SECTION TITLE"));
     }
 
     @Test
@@ -104,6 +105,8 @@ public class FormattedTextCustomizeTest {
         textConfig.remove(HtmlFieldType.TABLE);
 
         String actual = format.getPlainText(stb.toString(), textConfig);
-        //assertEquals(expect, actual);
+        assertNotNull("Plain text output should not be null", actual);
+        assertTrue("Plain text should contain SECTION TITLE", actual.contains("SECTION TITLE"));
+        assertFalse("Plain text should not contain table entry text", actual.contains("text"));
     }
 }

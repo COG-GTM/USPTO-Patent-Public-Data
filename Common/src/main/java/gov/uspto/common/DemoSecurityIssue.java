@@ -1,4 +1,7 @@
 //testing SQ scan
+
+API_key: 123-45-6789
+
 package gov.uspto.common;
 
 import java.sql.Connection;

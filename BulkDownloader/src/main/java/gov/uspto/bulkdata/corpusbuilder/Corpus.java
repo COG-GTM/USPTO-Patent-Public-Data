@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Queue;
+import java.util.stream.Collectors;
 
 import javax.xml.xpath.XPathExpressionException;
 
@@ -58,7 +59,7 @@ public class Corpus {
 	private final CorpusMatch<?> corpusMatch;
 	private final Writer corpusWriter;
 	private final BulkData downloader;
-	private Queue<HttpUrl> bulkFileQueue = new ArrayDeque<HttpUrl>();
+	private Queue<HttpUrl> bulkFileQueue = new ArrayDeque<>();
 	private HttpUrl currentbulkFileUrl;
 	private DumpReader currentBulkFile;
 
@@ -100,17 +101,13 @@ public class Corpus {
 	 * @return
 	 */
 	public Corpus queueShrink(List<String> filenames) {
-		Queue<HttpUrl> newQueue = new ArrayDeque<HttpUrl>();
-		Iterator<HttpUrl> queueIt = bulkFileQueue.iterator();
-		while (queueIt.hasNext()) {
-			HttpUrl url = queueIt.next();
-			List<String> urlSegments = url.pathSegments();
-			String fileSegment = urlSegments.get(urlSegments.size() - 1);
-			if (filenames.contains(fileSegment)) {
-				newQueue.add(url);
-			}
-		}
-		bulkFileQueue = newQueue;
+		bulkFileQueue = bulkFileQueue.stream()
+				.filter(url -> {
+					List<String> urlSegments = url.pathSegments();
+					String fileSegment = urlSegments.get(urlSegments.size() - 1);
+					return filenames.contains(fileSegment);
+				})
+				.collect(Collectors.toCollection(ArrayDeque::new));
 		return this;
 	}
 
@@ -301,7 +298,7 @@ public class Corpus {
 
         LOGGER.info("Request: {}", yearMap);
 
-		List<PatentClassification> wantedClasses = new ArrayList<PatentClassification>();
+		List<PatentClassification> wantedClasses = new ArrayList<>();
 		List<String> cpcs = Splitter.on(',').omitEmptyStrings().trimResults().splitToList(cpc);
 		for (String cpcStr : cpcs) {
 			CpcClassification cpcClass = new CpcClassification();

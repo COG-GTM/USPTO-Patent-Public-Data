@@ -54,7 +54,7 @@ public class OrgSynonymGenerator {
 			Matcher leadCompanyMatcher = LEAD_COMPANY_PATTERN.matcher(title);
 			if (leadCompanyMatcher.find()) {
 				String coSuffix = leadCompanyMatcher.group(1);
-				String shortTitle = leadCompanyMatcher.group(2);
+				String shortTitle = leadCompanyMatcher.group(3);
 				synonyms.add(shortTitle);
 				//name.setSuffix(coSuffix); // TODO add PREFIX property to name class.
 			}
@@ -78,8 +78,8 @@ public class OrgSynonymGenerator {
 
 		Matcher leadCompanyMatcher = LEAD_COMPANY_PATTERN.matcher(name.getName());
 		if (leadCompanyMatcher.find()) {
-			String coSuffix = leadCompanyMatcher.group(1);
-			String shortTitle = leadCompanyMatcher.group(2);
+				String coSuffix = leadCompanyMatcher.group(1);
+			String shortTitle = leadCompanyMatcher.group(3);
 			synonyms.add(shortTitle);
 			name.setSuffix(coSuffix);
 		}

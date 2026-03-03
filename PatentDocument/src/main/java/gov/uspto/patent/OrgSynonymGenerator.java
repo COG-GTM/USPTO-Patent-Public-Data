@@ -38,7 +38,7 @@ public class OrgSynonymGenerator {
 			.compile("(.+) ((?<!(:?&|[Aa]nd) )Co.|(?<!(:?&|[Aa]nd) )Company|Corporation|CORPORATION|Cooperative|Corp.|PTE),?$");
 
 	// Kabushiki Kaisha Toshiba == Toshiba Kabushiki Kaisha
-	private static final Pattern LEAD_COMPANY_PATTERN = Pattern.compile("^(Kabu(:?sh|hs)iki Kaisha|Koninklijke) (.+)$");
+	private static final Pattern LEAD_COMPANY_PATTERN = Pattern.compile("^(Kabu(?:sh|hs)iki Kaisha|Koninklijke) (.+)$");
 
 	public static void computeSynonyms(NameOrg name) {
 		Set<String> synonyms = name.getSynonyms();

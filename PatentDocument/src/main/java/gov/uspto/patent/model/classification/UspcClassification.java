@@ -62,7 +62,7 @@ public class UspcClassification extends PatentClassification {
 	private final static Pattern RANGE_REGEX = Pattern.compile("-([0-9A-Z]{1,9})$");
 
 	private String mainClass;
-	private SortedSet<String> subClass = new TreeSet<String>();
+	private SortedSet<String> subClass = new TreeSet<>();
 
 	@Override
 	public ClassificationType getType() {
@@ -116,12 +116,7 @@ public class UspcClassification extends PatentClassification {
 	 */
 	@Override
 	public String getTextNormalized() {
-		StringBuilder stb = new StringBuilder().append(mainClass).append('/');
-		for (String subRange : subClass) {
-			stb.append(subRange).append(',');
-		}
-		stb.deleteCharAt(stb.length() - 1);
-		return stb.toString();
+		return mainClass + "/" + String.join(",", subClass);
 	}
 
 	/**
@@ -132,13 +127,10 @@ public class UspcClassification extends PatentClassification {
 	 */
 	@Override
 	public String[] toFacet() {
-		Set<String> retFacets = new HashSet<String>();
-		for (String subRange : subClass) {
-			String[] facets = ClassificationTokenizer.partsToFacet(mainClass, subRange);
-			retFacets.addAll(Arrays.asList(facets));
-		}
-
-		return retFacets.toArray(new String[retFacets.size()]);
+		Set<String> retFacets = subClass.stream()
+				.flatMap(subRange -> Arrays.stream(ClassificationTokenizer.partsToFacet(mainClass, subRange)))
+				.collect(java.util.stream.Collectors.toCollection(HashSet::new));
+		return retFacets.toArray(new String[0]);
 	}
 
 	/**
@@ -149,26 +141,22 @@ public class UspcClassification extends PatentClassification {
 	 * @return
 	 */
 	public Set<String> toSet() {
-		Set<String> formats = new LinkedHashSet<String>();
+		Set<String> formats = new LinkedHashSet<>();
 		formats.add(mainClass);
 
-		for (String subRange : subClass) {
+		subClass.forEach(subRange -> {
 			if (subRange.length() >= 3) {
-				String format2 = new StringBuilder().append(mainClass).append("/").append(subRange.substring(0, 3))
-						.toString();
-				formats.add(format2);
+				formats.add(mainClass + "/" + subRange.substring(0, 3));
 			}
 
 			if (subRange.length() > 3) {
-				String format3 = new StringBuilder().append(mainClass).append("/").append(subRange.substring(0, 3))
-						.append(".").append(subRange.substring(3, subRange.length())).toString();
+				String format3 = mainClass + "/" + subRange.substring(0, 3) + "." + subRange.substring(3);
 
 				// Trim trailing Zeros.
 				format3 = format3.replaceFirst("\\.0*$|(\\.\\d*?)0+$", "$1");
-
 				formats.add(format3);
 			}
-		}
+		});
 
 		return formats;
 	}
@@ -212,7 +200,7 @@ public class UspcClassification extends PatentClassification {
 
 			setMainClass(mainClass);
 
-			SortedSet<String> subClassRange = new TreeSet<String>();
+			SortedSet<String> subClassRange = new TreeSet<>();
 			subClassRange.add(Strings.padEnd(subClass, 9, '0'));
 
 			if (backRange != null) {
@@ -270,16 +258,10 @@ public class UspcClassification extends PatentClassification {
 
 		UspcClassification uspc = (UspcClassification) check;
 		if (uspc.getSubClass().isEmpty()) {
-			return getMainClass().equals(((UspcClassification) check).getMainClass());
+			return getMainClass().equals(uspc.getMainClass());
 		} else {
-			for (String subClass : this.getSubClass()) {
-				for (String checkSubClass : uspc.getSubClass()) {
-					if (subClass.equals(checkSubClass)){
-						return true;
-					}
-				}
-			}
-			return false;
+			return this.getSubClass().stream()
+					.anyMatch(sc -> uspc.getSubClass().contains(sc));
 		}
 	}
 

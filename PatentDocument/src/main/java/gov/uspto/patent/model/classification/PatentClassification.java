@@ -65,13 +65,11 @@ public abstract class PatentClassification implements Classification {
 		return getChildBySymbol(symbol) != null;
 	}
 
-	public PatentClassification getChildBySymbol(String code) {	
-		for (PatentClassification classChild : this.children) {
-			if (classChild.getTextOriginal().equals(code)) {
-				return classChild;
-			}
-		}
-		return null;
+	public PatentClassification getChildBySymbol(String code) {
+		return this.children.stream()
+				.filter(classChild -> classChild.getTextOriginal().equals(code))
+				.findFirst()
+				.orElse(null);
 	}
 
 	/**
@@ -181,11 +179,8 @@ public abstract class PatentClassification implements Classification {
 	}
 
     public static Set<String> getFacetByType(Collection<PatentClassification> classes, ClassificationType wantedType) {
-        Set<PatentClassification> filtered = filter(classes, isType(wantedType));
-        Set<String> facets = new LinkedHashSet<String>();
-        for(PatentClassification clazz: filtered){
-            facets.addAll(Arrays.asList(clazz.toFacet()));
-        }
-        return facets;
+        return filter(classes, isType(wantedType)).stream()
+                .flatMap(clazz -> Arrays.stream(clazz.toFacet()))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 }

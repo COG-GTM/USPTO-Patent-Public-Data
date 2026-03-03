@@ -1,8 +1,8 @@
 package gov.uspto.patent.model;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Build Claim Tree by adding child claims to each claim a claim is dependent on; 
@@ -20,21 +20,17 @@ public class ClaimTreeBuilder {
     }
 
     public void build() {
-        for (Claim claim : claims) {
-            if (claim.getDependentIds() != null && claim.getDependentIds().size() > 0) {
-                List<Claim> dependentClaims = getClaims(claim.getDependentIds());
-                for (Claim patentClaim : dependentClaims) {
-                    patentClaim.addChildClaim(claim);
-                }
-            }
-        }
+        claims.stream()
+                .filter(claim -> claim.getDependentIds() != null && !claim.getDependentIds().isEmpty())
+                .forEach(claim -> getClaims(claim.getDependentIds())
+                        .forEach(patentClaim -> patentClaim.addChildClaim(claim)));
 
-        for (Claim claim : claims) {
-            if (ClaimType.INDEPENDENT.equals(claim.getClaimType())) {
-                claim.setClaimTreeLevel(0);
-                createLevel(claim);
-            }
-        }
+        claims.stream()
+                .filter(claim -> ClaimType.INDEPENDENT.equals(claim.getClaimType()))
+                .forEach(claim -> {
+                    claim.setClaimTreeLevel(0);
+                    createLevel(claim);
+                });
     }
 
     /**
@@ -58,14 +54,8 @@ public class ClaimTreeBuilder {
      * @return
      */
     public List<Claim> getClaims(Collection<String> claimIds) {
-        List<Claim> foundClaims = new ArrayList<Claim>();
-        for (String claimId : claimIds) {
-            for (Claim claim : this.claims) {
-                if (claim.getId().equals(claimId)) {
-                    foundClaims.add(claim);
-                }
-            }
-        }
-        return foundClaims;
+        return this.claims.stream()
+                .filter(claim -> claimIds.contains(claim.getId()))
+                .collect(Collectors.toList());
     }
 }

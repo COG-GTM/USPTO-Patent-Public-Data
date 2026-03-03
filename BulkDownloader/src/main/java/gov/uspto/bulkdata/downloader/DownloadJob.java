@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jdk7.Jdk7Module;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import okhttp3.HttpUrl;
 
 @JsonSerialize
@@ -34,7 +34,7 @@ public class DownloadJob implements Serializable, Iterable<DownloadFile> {
 
 	private static ObjectMapper JSON_MAPPER = new ObjectMapper();
 	static {
-		JSON_MAPPER.registerModule(new Jdk7Module());
+		JSON_MAPPER.registerModule(new Jdk8Module());
 	}
 	
 	private Path downloadDir;
@@ -55,11 +55,14 @@ public class DownloadJob implements Serializable, Iterable<DownloadFile> {
 		this.downloadDir = downloadDir;
 		this.taskTotal = urls.size();
 
-		this.downloadTasks = new ArrayList<DownloadFile>();
-		for (HttpUrl url : urls) {
-			DownloadFile download = new DownloadFile(url, downloadDir);
-			downloadTasks.add(download);
-		}
+		this.downloadTasks = new ArrayList<>();
+		urls.forEach(url -> {
+			try {
+				downloadTasks.add(new DownloadFile(url, downloadDir));
+			} catch (IOException e) {
+				throw new RuntimeException("Failed to create DownloadFile for URL: " + url, e);
+			}
+		});
 	}
 
 	/**
@@ -80,15 +83,7 @@ public class DownloadJob implements Serializable, Iterable<DownloadFile> {
 	}
 
 	public int getTaskCompleted() {
-		int count = 0;
-
-		for (DownloadFile task : downloadTasks) {
-			if (task.isComplete()) {
-				count++;
-			}
-		}
-
-		return count;
+		return (int) downloadTasks.stream().filter(DownloadFile::isComplete).count();
 	}
 
 	public boolean isComplete() {
@@ -123,7 +118,7 @@ public class DownloadJob implements Serializable, Iterable<DownloadFile> {
 		Writer outFile = new OutputStreamWriter(new FileOutputStream(downloadStatusFile));
 
 		ObjectMapper mapper = new ObjectMapper();
-		mapper.registerModule(new Jdk7Module());
+		mapper.registerModule(new Jdk8Module());
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
 		mapper.writeValue(outFile, this);
 	}

@@ -382,7 +382,7 @@ public class FormattedText implements TextProcessor {
 				if (containedTxt.matches("[0-9]{1,2}[A-z]?")){
 					Element newEl = element.clone();
 					newEl.attr("id", "FR-" + Strings.padStart(containedTxt, 4, '0'));
-					newEl.attr("idref", ReferenceTagger.createFigId(containedTxt));
+					newEl.attr("idref", "FIG-" + containedTxt);
 					newEl.tagName("a");
 					newEl.addClass("figref");
 					newEl.text(containedTxt);

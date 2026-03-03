@@ -105,7 +105,7 @@ public class BulkData {
 
     public DownloadJob downloadRandom(int limit) throws IOException {
         List<HttpUrl> urls = fetchLinks();
-        List<HttpUrl> randomUrls = new ArrayList<HttpUrl>();
+        List<HttpUrl> randomUrls = new ArrayList<>(limit);
 
         Random random = new Random();
         for (int i = 0; i < limit; i++) {
@@ -155,7 +155,7 @@ public class BulkData {
     }
 
     private List<HttpUrl> fetchLinks() throws IOException {
-        List<HttpUrl> urls = new LinkedList<HttpUrl>();
+        List<HttpUrl> urls = new LinkedList<>();
         while (yearIterator.hasNext()) {
             String year = yearIterator.next();
             //String fileRegex = "[A-z]{3,6}" + yearMap.get(year) + ".*?" + "\\." + dataType.getSuffix() + "$";
@@ -212,27 +212,24 @@ public class BulkData {
     public static void main(String... args) throws IOException {
         LOGGER.info("--- Start ---");
 
-        OptionParser parser = new OptionParser() {
-            {
-                accepts("type").withRequiredArg().ofType(String.class)
-                        .describedAs("Patent Document Type [grant, application, gazette]").required();
-                accepts("date").withRequiredArg().ofType(String.class)
-                        .describedAs("Single Date Range or list, example: 20150801-20150901,20160501-20160601")
-                        .required();
-                accepts("limit").withOptionalArg().ofType(Integer.class).describedAs("download file limit")
-                        .defaultsTo(0);
-                accepts("skip").withRequiredArg().ofType(Integer.class).describedAs("skip number of files")
-                        .defaultsTo(0);
-                accepts("async").withOptionalArg().ofType(Boolean.class).describedAs("async download")
-                        .defaultsTo(false);
-                accepts("outdir").withOptionalArg().ofType(String.class).describedAs("directory")
-                        .defaultsTo("download");
-                accepts("filename").withOptionalArg().ofType(String.class)
-                        .describedAs("parse links for file name and download");
-                accepts("restart").withOptionalArg().ofType(String.class)
-                        .describedAs("Restart failed download from job file in download directory.");
-            }
-        };
+        OptionParser parser = new OptionParser();
+        parser.accepts("type").withRequiredArg().ofType(String.class)
+                .describedAs("Patent Document Type [grant, application, gazette]").required();
+        parser.accepts("date").withRequiredArg().ofType(String.class)
+                .describedAs("Single Date Range or list, example: 20150801-20150901,20160501-20160601")
+                .required();
+        parser.accepts("limit").withOptionalArg().ofType(Integer.class).describedAs("download file limit")
+                .defaultsTo(0);
+        parser.accepts("skip").withRequiredArg().ofType(Integer.class).describedAs("skip number of files")
+                .defaultsTo(0);
+        parser.accepts("async").withOptionalArg().ofType(Boolean.class).describedAs("async download")
+                .defaultsTo(false);
+        parser.accepts("outdir").withOptionalArg().ofType(String.class).describedAs("directory")
+                .defaultsTo("download");
+        parser.accepts("filename").withOptionalArg().ofType(String.class)
+                .describedAs("parse links for file name and download");
+        parser.accepts("restart").withOptionalArg().ofType(String.class)
+                .describedAs("Restart failed download from job file in download directory.");
 
         OptionSet options = parser.parse(args);
         if (!options.hasOptions()) {

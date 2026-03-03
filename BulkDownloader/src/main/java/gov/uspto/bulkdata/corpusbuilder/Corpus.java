@@ -58,7 +58,7 @@ public class Corpus {
 	private final CorpusMatch<?> corpusMatch;
 	private final Writer corpusWriter;
 	private final BulkData downloader;
-	private Queue<HttpUrl> bulkFileQueue = new ArrayDeque<HttpUrl>();
+	private Queue<HttpUrl> bulkFileQueue = new ArrayDeque<>();
 	private HttpUrl currentbulkFileUrl;
 	private DumpReader currentBulkFile;
 
@@ -100,17 +100,11 @@ public class Corpus {
 	 * @return
 	 */
 	public Corpus queueShrink(List<String> filenames) {
-		Queue<HttpUrl> newQueue = new ArrayDeque<HttpUrl>();
-		Iterator<HttpUrl> queueIt = bulkFileQueue.iterator();
-		while (queueIt.hasNext()) {
-			HttpUrl url = queueIt.next();
+		bulkFileQueue.removeIf(url -> {
 			List<String> urlSegments = url.pathSegments();
 			String fileSegment = urlSegments.get(urlSegments.size() - 1);
-			if (filenames.contains(fileSegment)) {
-				newQueue.add(url);
-			}
-		}
-		bulkFileQueue = newQueue;
+			return !filenames.contains(fileSegment);
+		});
 		return this;
 	}
 
@@ -218,31 +212,31 @@ public class Corpus {
 	public static void main(String... args) throws IOException, XPathExpressionException, ParseException {
 		LOGGER.info("--- Start ---");
 
-		OptionParser parser = new OptionParser() {
-			{
-				accepts("type").withRequiredArg().ofType(String.class)
-						.describedAs("Patent Document Type [grant, application]").required();
-                accepts("date").withRequiredArg().ofType(String.class)
-                .describedAs("Single Date Range or list, example: 20150801-20150901,20160501-20160601")
-                .required();
-				accepts("skip").withOptionalArg().ofType(Integer.class).describedAs("Number of bulk files to skip")
-						.defaultsTo(0);
-				accepts("delete").withOptionalArg().ofType(Boolean.class)
-						.describedAs("Delete each bulk file before moving to next.").defaultsTo(true);
-				accepts("outdir").withOptionalArg().ofType(String.class).describedAs("directory")
-						.defaultsTo("download");
-				accepts("cpc").withRequiredArg().ofType(String.class).describedAs("CPC Classification").required();
-				accepts("uspc").withRequiredArg().ofType(String.class).describedAs("USPC Classification").required();
-				accepts("files").withOptionalArg().ofType(String.class).describedAs("File names to download and parse");
-				accepts("out").withOptionalArg().ofType(String.class).describedAs("Output Type: xml or zip")
-						.defaultsTo("xml");
-				accepts("name").withOptionalArg().ofType(String.class).describedAs("Name to give output file")
-						.defaultsTo("corpus");
-				accepts("eval").withOptionalArg().ofType(String.class).describedAs("Eval [xml, patent]: XML (Xpath XML lookup) or Patent to Instatiate Patent Object")
+		OptionParser parser = new OptionParser();
+		parser.accepts("type").withRequiredArg().ofType(String.class)
+				.describedAs("Patent Document Type [grant, application]").required();
+		parser.accepts("date").withRequiredArg().ofType(String.class)
+				.describedAs("Single Date Range or list, example: 20150801-20150901,20160501-20160601")
+				.required();
+		parser.accepts("skip").withOptionalArg().ofType(Integer.class).describedAs("Number of bulk files to skip")
+				.defaultsTo(0);
+		parser.accepts("delete").withOptionalArg().ofType(Boolean.class)
+				.describedAs("Delete each bulk file before moving to next.").defaultsTo(true);
+		parser.accepts("outdir").withOptionalArg().ofType(String.class).describedAs("directory")
+				.defaultsTo("download");
+		parser.accepts("cpc").withRequiredArg().ofType(String.class).describedAs("CPC Classification").required();
+		parser.accepts("uspc").withRequiredArg().ofType(String.class).describedAs("USPC Classification").required();
+		parser.accepts("files").withOptionalArg().ofType(String.class).describedAs("File names to download and parse");
+		parser.accepts("out").withOptionalArg().ofType(String.class).describedAs("Output Type: xml or zip")
 				.defaultsTo("xml");
-				accepts("xmlBodyTag").withOptionalArg().ofType(String.class).describedAs("XML Body Tag which wrapps document: [us-patent, PATDOC, patent-application-publication]").defaultsTo("us-patent");
-			}
-		};
+		parser.accepts("name").withOptionalArg().ofType(String.class).describedAs("Name to give output file")
+				.defaultsTo("corpus");
+		parser.accepts("eval").withOptionalArg().ofType(String.class)
+				.describedAs("Eval [xml, patent]: XML (Xpath XML lookup) or Patent to Instatiate Patent Object")
+				.defaultsTo("xml");
+		parser.accepts("xmlBodyTag").withOptionalArg().ofType(String.class)
+				.describedAs("XML Body Tag which wrapps document: [us-patent, PATDOC, patent-application-publication]")
+				.defaultsTo("us-patent");
 
 		OptionSet options = parser.parse(args);
 		if (!options.hasOptions()) {
@@ -257,7 +251,7 @@ public class Corpus {
 		Path downloadDir = Paths.get((String) options.valueOf("outdir"));
 
 		List<String> filenames = null;
-		if (options.has("filename")) {
+		if (options.has("files")) {
 			String files = (String) options.valueOf("files");
 			filenames = Splitter.on(",").trimResults().omitEmptyStrings().splitToList(files);
 		}
@@ -301,7 +295,7 @@ public class Corpus {
 
         LOGGER.info("Request: {}", yearMap);
 
-		List<PatentClassification> wantedClasses = new ArrayList<PatentClassification>();
+		List<PatentClassification> wantedClasses = new ArrayList<>();
 		List<String> cpcs = Splitter.on(',').omitEmptyStrings().trimResults().splitToList(cpc);
 		for (String cpcStr : cpcs) {
 			CpcClassification cpcClass = new CpcClassification();

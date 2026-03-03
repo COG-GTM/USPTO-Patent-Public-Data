@@ -59,13 +59,7 @@ public class MasterCpcCsvBuilder implements DocumentBuilder<MasterClassification
     }
 
     private String toCSV(String[] strings) {
-        StringBuilder stb = new StringBuilder();
-        for (String str : strings) {
-            stb.append(str).append(",");
-        }
-        stb.delete(stb.length() - 1, stb.length());
-        stb.append("\n");
-        return stb.toString();
+        return String.join(",", strings) + "\n";
     }
 
 }

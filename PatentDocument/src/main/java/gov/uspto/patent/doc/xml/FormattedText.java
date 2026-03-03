@@ -1,6 +1,5 @@
 package gov.uspto.patent.doc.xml;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -181,12 +180,7 @@ public class FormattedText implements TextProcessor {
 			mathFound = true;
 
 			// String mathml = MathmlEscaper.escape(element.outerHtml());
-			String mathml = "";
-			try {
-				mathml = Base64.getEncoder().encodeToString(element.outerHtml().getBytes("utf-8"));
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			}
+			String mathml = Base64.getEncoder().encodeToString(element.outerHtml().getBytes(StandardCharsets.UTF_8));
 
 			Element newEl = new Element(Tag.valueOf("span"), "");
 			newEl.attr("id", "MTH-" + Strings.padStart(String.valueOf(i), 4, '0'));
@@ -289,13 +283,9 @@ public class FormattedText implements TextProcessor {
 					.charset(StandardCharsets.UTF_8);
 
 			for (Element el : document.select("span[class=math]")) {
-				try {
-					String html = new String(Base64.getDecoder().decode(el.html()), "utf-8");
-					el.text("");
-					el.append(html);
-				} catch (UnsupportedEncodingException e) {
-					e.printStackTrace();
-				}
+				String html = new String(Base64.getDecoder().decode(el.html()), StandardCharsets.UTF_8);
+				el.text("");
+				el.append(html);
 			}
 			docStr = document.select("body").html();
 		}
@@ -382,7 +372,7 @@ public class FormattedText implements TextProcessor {
 				if (containedTxt.matches("[0-9]{1,2}[A-z]?")){
 					Element newEl = element.clone();
 					newEl.attr("id", "FR-" + Strings.padStart(containedTxt, 4, '0'));
-					newEl.attr("idref", ReferenceTagger.createFigId(containedTxt));
+					newEl.attr("idref", ReferenceTagger.createFigId("FIG. " + containedTxt));
 					newEl.tagName("a");
 					newEl.addClass("figref");
 					newEl.text(containedTxt);

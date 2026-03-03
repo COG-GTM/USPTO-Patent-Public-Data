@@ -3,6 +3,7 @@ package gov.uspto.common.filter;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -13,22 +14,15 @@ import java.util.List;
  */
 public class FileFilterChain implements FileFilter {
 
-    public List<FileFilter> matchRules = new ArrayList<FileFilter>();
+    public List<FileFilter> matchRules = new ArrayList<>();
 
     public void addRule(FileFilter... rules) {
-        for (FileFilter rule : rules) {
-            matchRules.add(rule);
-        }
+        Collections.addAll(matchRules, rules);
     }
 
     @Override
     public boolean accept(File file) {
-        for (FileFilter rule : matchRules) {
-            if (!rule.accept(file)) {
-                return false;
-            }
-        }
-        return true;
+        return matchRules.stream().allMatch(rule -> rule.accept(file));
     }
 
     @Override

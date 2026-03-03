@@ -65,13 +65,11 @@ public abstract class PatentClassification implements Classification {
 		return getChildBySymbol(symbol) != null;
 	}
 
-	public PatentClassification getChildBySymbol(String code) {	
-		for (PatentClassification classChild : this.children) {
-			if (classChild.getTextOriginal().equals(code)) {
-				return classChild;
-			}
-		}
-		return null;
+	public PatentClassification getChildBySymbol(String code) {
+		return this.children.stream()
+				.filter(child -> Objects.equals(child.getTextOriginal(), code))
+				.findFirst()
+				.orElse(null);
 	}
 
 	/**
@@ -156,10 +154,10 @@ public abstract class PatentClassification implements Classification {
         List<T> retClasses = new ArrayList<T>();
         for (String textClass : classificationStrings) {
             try {
-                T classification = classificationClass.newInstance();
+                T classification = classificationClass.getDeclaredConstructor().newInstance();
                 classification.parseText(textClass);
                 retClasses.add(classification);
-            } catch (ParseException | InstantiationException | IllegalAccessException e) {
+            } catch (ParseException | ReflectiveOperationException e) {
                 LOGGER.error("Failed to parse provided Classification: " + textClass, e);
             }
         }
@@ -181,11 +179,8 @@ public abstract class PatentClassification implements Classification {
 	}
 
     public static Set<String> getFacetByType(Collection<PatentClassification> classes, ClassificationType wantedType) {
-        Set<PatentClassification> filtered = filter(classes, isType(wantedType));
-        Set<String> facets = new LinkedHashSet<String>();
-        for(PatentClassification clazz: filtered){
-            facets.addAll(Arrays.asList(clazz.toFacet()));
-        }
-        return facets;
+        return filter(classes, isType(wantedType)).stream()
+                .flatMap(clazz -> Arrays.stream(clazz.toFacet()))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 }

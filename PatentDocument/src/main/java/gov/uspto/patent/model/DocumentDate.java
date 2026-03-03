@@ -1,9 +1,9 @@
 package gov.uspto.patent.model;
 
 import java.text.ParseException;
-import java.util.Calendar;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.TimeZone;
 
 import org.apache.commons.lang3.time.DateParser;
 import org.apache.commons.lang3.time.FastDateFormat;
@@ -15,7 +15,8 @@ public class DocumentDate {
     /*
      * FastDateFormat is Thread-Safe version of SimpleDateFormat
      */
-    private static final FastDateFormat DATE_ISO_FORMAT = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    private static final DateTimeFormatter DATE_ISO_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+            .withZone(ZoneOffset.UTC);
 
     private static final DateParser DATE_YEAR_FORMAT = FastDateFormat.getInstance("yyyy");
     private static final DateParser DATE_PATENT_FORMAT = FastDateFormat.getInstance("yyyyMMdd");
@@ -33,9 +34,7 @@ public class DocumentDate {
     }
 
     public int getYear() {
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-        calendar.setTime(date);
-        return calendar.get(Calendar.YEAR);
+        return date.toInstant().atZone(ZoneOffset.UTC).getYear();
     }
 
     public void setDate(String date) throws InvalidDataException {
@@ -75,7 +74,7 @@ public class DocumentDate {
         if (date == null) {
             return null;
         }
-        return DATE_ISO_FORMAT.format(date);
+        return DATE_ISO_FORMAT.format(date.toInstant());
     }
 
     @Override

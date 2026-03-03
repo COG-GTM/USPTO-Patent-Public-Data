@@ -1,8 +1,10 @@
 package gov.uspto.patent.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Patent Description
@@ -34,21 +36,17 @@ public class Description {
 	}
 
 	public Figure getFigure(String id) {
-		for (Figure fig : figures) {
-			if (fig.hasId(id)) {
-				return fig;
-			}
-		}
-		return null;
+		return figures.stream()
+				.filter(fig -> fig.hasId(id))
+				.findFirst()
+				.orElse(null);
 	}
 
 	public DescriptionSection getSection(DescSection section) {
-		for (DescriptionSection sec : sections) {
-			if (sec.getSection().equals(section)) {
-				return sec;
-			}
-		}
-		return null;
+		return sections.stream()
+				.filter(sec -> sec.getSection().equals(section))
+				.findFirst()
+				.orElse(null);
 	}
 
 	public void addSection(DescriptionSection section) {
@@ -60,76 +58,52 @@ public class Description {
 	}
 
 	public String getAllRawText() {
-		StringBuilder stb = new StringBuilder();
-
-		for (DescriptionSection sec : sections) {
-			stb.append(sec.getRawText()).append("\n");
-		}
-
-		return stb.toString();
+		String joined = sections.stream()
+				.map(DescriptionSection::getRawText)
+				.collect(Collectors.joining("\n"));
+		return joined.isEmpty() ? "" : joined + "\n";
 	}
 
 	public String getRawText(DescSection... descSections) {
-		StringBuilder stb = new StringBuilder();
-
-		for (DescSection decSec : descSections) {
-			for (DescriptionSection sec : sections) {
-				if (sec.getSection().equals(decSec)) {
-					stb.append(sec.getRawText()).append("\n");
-				}
-			}
-		}
-
-		return stb.toString();
+		List<DescSection> wanted = Arrays.asList(descSections);
+		String joined = sections.stream()
+				.filter(sec -> wanted.contains(sec.getSection()))
+				.map(DescriptionSection::getRawText)
+				.collect(Collectors.joining("\n"));
+		return joined.isEmpty() ? "" : joined + "\n";
 	}
 
 	public String getAllPlainText() {
-		StringBuilder stb = new StringBuilder();
-
-		for (DescriptionSection sec : sections) {
-			stb.append(sec.getPlainText()).append("\n");
-		}
-
-		return stb.toString();
+		String joined = sections.stream()
+				.map(DescriptionSection::getPlainText)
+				.collect(Collectors.joining("\n"));
+		return joined.isEmpty() ? "" : joined + "\n";
 	}
 
 	public String getPlainText(DescSection... descSections) {
-		StringBuilder stb = new StringBuilder();
-
-		for (DescSection decSec : descSections) {
-			for (DescriptionSection sec : sections) {
-				if (sec.getSection().equals(decSec)) {
-					stb.append(sec.getPlainText()).append("\n");
-				}
-			}
-		}
-
-		return stb.toString();
+		List<DescSection> wanted = Arrays.asList(descSections);
+		String joined = sections.stream()
+				.filter(sec -> wanted.contains(sec.getSection()))
+				.map(DescriptionSection::getPlainText)
+				.collect(Collectors.joining("\n"));
+		return joined.isEmpty() ? "" : joined + "\n";
 	}
 
 	public String getSimpleHtml() {
-		StringBuilder stb = new StringBuilder();
-
-		for (DescriptionSection sec : sections) {
-				stb.append(sec.getSimpleHtml()).append("\n");
-		}
-
-		return stb.toString();
+		String joined = sections.stream()
+				.map(DescriptionSection::getSimpleHtml)
+				.collect(Collectors.joining("\n"));
+		return joined.isEmpty() ? "" : joined + "\n";
 	}
 
 	
 	public String getSimpleHtml(DescSection... descSections) {
-		StringBuilder stb = new StringBuilder();
-
-		for (DescSection decSec : descSections) {
-			for (DescriptionSection sec : sections) {
-				if (sec.getSection().equals(decSec)) {
-					stb.append(sec.getSimpleHtml()).append("\n");
-				}
-			}
-		}
-
-		return stb.toString();
+		List<DescSection> wanted = Arrays.asList(descSections);
+		String joined = sections.stream()
+				.filter(sec -> wanted.contains(sec.getSection()))
+				.map(DescriptionSection::getSimpleHtml)
+				.collect(Collectors.joining("\n"));
+		return joined.isEmpty() ? "" : joined + "\n";
 	}
 
 	@Override

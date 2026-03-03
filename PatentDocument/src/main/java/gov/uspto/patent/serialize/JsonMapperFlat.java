@@ -189,7 +189,7 @@ public class JsonMapperFlat implements DocumentBuilder<Patent> {
     }
 
     public String getPrettyPrint(JsonObject jsonObject) throws IOException {
-        Map<String, Boolean> config = new HashMap<String, Boolean>();
+        Map<String, Boolean> config = new HashMap<>();
         config.put(JsonGenerator.PRETTY_PRINTING, true);
 
         JsonWriterFactory writerFactory = Json.createWriterFactory(config);
@@ -226,7 +226,7 @@ public class JsonMapperFlat implements DocumentBuilder<Patent> {
 
             JsonArrayBuilder futherRawAr = Json.createArrayBuilder();
             JsonArrayBuilder futherNormAr = Json.createArrayBuilder();
-            SortedSet<String> futherFacets = new TreeSet<String>();
+            SortedSet<String> futherFacets = new TreeSet<>();
 
             for (PatentClassification furtherClassification : claz.getChildren()) {
                 IpcClassification furtherClass = (IpcClassification) furtherClassification;
@@ -249,7 +249,7 @@ public class JsonMapperFlat implements DocumentBuilder<Patent> {
 
             JsonArrayBuilder futherRawAr = Json.createArrayBuilder();
             JsonArrayBuilder futherNormAr = Json.createArrayBuilder();
-            SortedSet<String> futherFacets = new TreeSet<String>();
+            SortedSet<String> futherFacets = new TreeSet<>();
 
             for (PatentClassification furtherClassification : claz.getChildren()) {
                 UspcClassification furtherClass = (UspcClassification) furtherClassification;
@@ -272,7 +272,7 @@ public class JsonMapperFlat implements DocumentBuilder<Patent> {
 
             JsonArrayBuilder futherRawAr = Json.createArrayBuilder();
             JsonArrayBuilder futherNormAr = Json.createArrayBuilder();
-            SortedSet<String> futherFacets = new TreeSet<String>();
+            SortedSet<String> futherFacets = new TreeSet<>();
 
             for (PatentClassification furtherClassification : claz.getChildren()) {
                 CpcClassification furtherClass = (CpcClassification) furtherClassification;
@@ -288,7 +288,7 @@ public class JsonMapperFlat implements DocumentBuilder<Patent> {
 
     private JsonArray mapExaminerDepartment(Collection<Examiner> examiners) {
 
-        Set<String> depts = new HashSet<String>();
+        Set<String> depts = new HashSet<>();
         for (Examiner examiner : examiners) {
             depts.add(examiner.getDepartment());
         }

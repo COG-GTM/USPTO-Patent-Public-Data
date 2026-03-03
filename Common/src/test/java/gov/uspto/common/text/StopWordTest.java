@@ -166,7 +166,7 @@ public class StopWordTest {
 		List<String> newList = new ArrayList<String>();
 		newList.add("mountain");
 		newList.add("this");
-		assertFalse(stopword.hasTrailing(newList));
+		assertTrue(stopword.hasTrailing(newList));
 	}
 
 	@Test
@@ -197,6 +197,6 @@ public class StopWordTest {
 		List<String> newList = new ArrayList<String>();
 		newList.add("mountain");
 		newList.add("this");
-		assertFalse(stopword.hasEdge(newList));
+		assertTrue(stopword.hasEdge(newList));
 	}
 }

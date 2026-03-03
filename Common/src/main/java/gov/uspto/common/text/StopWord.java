@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
@@ -71,11 +72,7 @@ public class StopWord {
 	 * @throws IOException
 	 */
 	public void load() throws IOException {
-
-		BufferedReader reader = null;
-		try {
-			reader = Files.newBufferedReader(file, StandardCharsets.US_ASCII);
-
+		try (BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.US_ASCII)) {
 			String line;
 			while ((line = reader.readLine()) != null) {
 				line = line.trim();
@@ -89,11 +86,6 @@ public class StopWord {
 				} else if (line.length() > 0) {
 					stopwords.add(line.toLowerCase().trim());
 				}
-			}
-
-		} finally {
-			if (reader != null) {
-				reader.close();
 			}
 		}
 	}
@@ -214,14 +206,8 @@ public class StopWord {
 	 * @return
 	 */
 	public boolean hasLeading(String text) {
-		for (String word : text.split("\\s")) {
-			if (stopwords.contains(word)) {
-				return true;
-			}
-			return false;
-		}
-
-		return false;
+		String[] parts = text.split("\\s");
+		return parts.length > 0 && stopwords.contains(parts[0]);
 	}
 
 	/**
@@ -231,14 +217,7 @@ public class StopWord {
 	 * @return
 	 */
 	public boolean hasLeading(String... text) {
-		for (String word : text) {
-			if (stopwords.contains(word)) {
-				return true;
-			}
-			return false;
-		}
-
-		return false;
+		return text.length > 0 && stopwords.contains(text[0]);
 	}
 
 	/**
@@ -248,14 +227,7 @@ public class StopWord {
 	 * @return
 	 */
 	public boolean hasLeading(Collection<String> text) {
-		for (String word : text) {
-			if (stopwords.contains(word)) {
-				return true;
-			}
-			return false;
-		}
-
-		return false;
+		return text.stream().findFirst().map(stopwords::contains).orElse(false);
 	}
 
 	/**
@@ -265,17 +237,8 @@ public class StopWord {
 	 * @return
 	 */
 	public boolean hasTrailing(String text) {
-		List<String> textList = Arrays.asList(text.split("\\s"));
-		Collections.reverse(textList);
-
-		for (String word : textList) {
-			if (stopwords.contains(word)) {
-				return true;
-			}
-			return false;
-		}
-
-		return false;
+		String[] parts = text.split("\\s");
+		return parts.length > 0 && stopwords.contains(parts[parts.length - 1]);
 	}
 
 	/**
@@ -285,14 +248,7 @@ public class StopWord {
 	 * @return
 	 */
 	public boolean hasTrailing(String... text) {
-		for (int i = text.length - 1; i > 0; i--) {
-			if (stopwords.contains(text[i])) {
-				return true;
-			}
-			return false;
-		}
-
-		return false;
+		return text.length > 0 && stopwords.contains(text[text.length - 1]);
 	}
 
 	/**
@@ -302,14 +258,7 @@ public class StopWord {
 	 * @return
 	 */
 	public boolean hasTrailing(List<String> text) {
-		for (int i = text.size() - 1; i == 0; i--) {
-			if (stopwords.contains(text.get(i))) {
-				return true;
-			}
-			return false;
-		}
-
-		return false;
+		return !text.isEmpty() && stopwords.contains(text.get(text.size() - 1));
 	}
 
 	/**
@@ -428,14 +377,9 @@ public class StopWord {
 	 * @return
 	 */
 	public String[] remove(String... text) {
-		List<String> result = new ArrayList<String>();
-		for (String word : text) {
-			if (!stopwords.contains(word)) {
-				result.add(word);
-			}
-		}
-
-		return result.toArray(new String[result.size()]);
+		return Arrays.stream(text)
+				.filter(word -> !stopwords.contains(word))
+				.toArray(String[]::new);
 	}
 
 	/**
@@ -444,14 +388,9 @@ public class StopWord {
 	 * @return
 	 */
 	public List<String> remove(Collection<String> text) {
-		List<String> result = new ArrayList<String>();
-		for (String word : text) {
-			if (!stopwords.contains(word)) {
-				result.add(word);
-			}
-		}
-
-		return result;
+		return text.stream()
+				.filter(word -> !stopwords.contains(word))
+				.collect(Collectors.toList());
 	}
 
 	/**

@@ -2,6 +2,17 @@
 /build/
 /target/
 /download/
+
+# Ignore build output in submodules
+**/target/
+**/bin/
+
+# Ignore Eclipse workspace metadata
+/.settings/
+**/.settings/org.eclipse.core.resources.prefs
+**/.settings/org.eclipse.jdt.apt.core.prefs
+AuthenticationService/.project
+
 *~
 *.swp
 *.swo

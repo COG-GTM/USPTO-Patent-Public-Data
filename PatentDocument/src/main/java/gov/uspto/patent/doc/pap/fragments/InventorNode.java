@@ -30,7 +30,7 @@ public class InventorNode extends DOMFragmentReader<List<Inventor>> {
 
 	@Override
 	public List<Inventor> read() {
-		inventorList = new ArrayList<Inventor>();
+		inventorList = new ArrayList<>();
 
 		@SuppressWarnings("unchecked")
 		List<Node> inventors = document.selectNodes(FRAGMENT_PATH1);

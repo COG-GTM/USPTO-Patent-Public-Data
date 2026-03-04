@@ -59,7 +59,7 @@ public class WordUtilTest {
 
     @Test
     public void hasWord() {
-        List<String> stopwords = new ArrayList<String>();
+        List<String> stopwords = new ArrayList<>();
         stopwords.add("stop");
 
         boolean found = WordUtil.hasWord("one two stop three", stopwords);
@@ -73,7 +73,7 @@ public class WordUtilTest {
 
     @Test
     public void hasLeadWord() {
-        List<String> stopwords = new ArrayList<String>();
+        List<String> stopwords = new ArrayList<>();
         stopwords.add("stop");
 
         boolean found = WordUtil.hasLeadWord("stop two stop three", stopwords, false);

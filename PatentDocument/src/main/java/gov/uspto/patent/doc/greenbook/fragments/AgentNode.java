@@ -46,7 +46,7 @@ public class AgentNode extends DOMFragmentReader<List<Agent>> {
 
 	@Override
 	public List<Agent> read(){
-		List<Agent> agentList = new ArrayList<Agent>();
+		List<Agent> agentList = new ArrayList<>();
 
 		Node legalRep = document.selectSingleNode(FRAGMENT_PATH);
 		if (legalRep == null){

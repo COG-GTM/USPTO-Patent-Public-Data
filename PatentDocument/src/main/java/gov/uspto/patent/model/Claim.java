@@ -16,7 +16,7 @@ public class Claim extends FreetextField {
     private String rawText;
     private ClaimType claimType;
     private Set<String> dependentIds; // Parent claims this claim is dependent on.
-    private Set<Claim> childClaims = new LinkedHashSet<Claim>();
+    private Set<Claim> childClaims = new LinkedHashSet<>();
     private int claimTreeLevel = -1;
 
     // REGEX to remove number in front of claim text.

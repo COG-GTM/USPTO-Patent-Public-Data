@@ -45,7 +45,7 @@ public class BraceCodes {
 	 * Unicode combing marks are to only be use if the unicode does not exist.
 	 * Note for Search Indexes as well as RDMS see Solr mapping-FoldToASCII.txt
 	 */
-	private static final Map<String, Character> ACCENT_COMBINING = new HashMap<String, Character>();
+	private static final Map<String, Character> ACCENT_COMBINING = new HashMap<>();
 	static {
 		ACCENT_COMBINING.put("grave", '\u0300');
 		ACCENT_COMBINING.put("acute", '\u0301');
@@ -69,7 +69,7 @@ public class BraceCodes {
 	/*
 	 * Unicode Accent Lookup Table
 	 */
-	private static final Map<String, String> ACCENTS = new HashMap<String, String>();
+	private static final Map<String, String> ACCENTS = new HashMap<>();
 	static {
 		ACCENTS.put("blank_umlaut", "");
 		
@@ -328,7 +328,7 @@ public class BraceCodes {
 	/*
 	 * Map Greek Letters
 	 */
-	private static final HashMap<Character, String> GREEK_LETTERS = new HashMap<Character, String>();
+	private static final HashMap<Character, String> GREEK_LETTERS = new HashMap<>();
 	static {
 		GREEK_LETTERS.put('\u03B1', "alpha");
 		GREEK_LETTERS.put('\u03B2', "beta");

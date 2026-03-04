@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class RegexFilter implements FileFilter, StringFilter {
-    private List<Pattern> regexes = new ArrayList<Pattern>();
+    private List<Pattern> regexes = new ArrayList<>();
 
     public RegexFilter(String... regexes) {
         for (String regex : regexes) {

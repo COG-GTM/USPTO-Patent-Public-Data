@@ -25,8 +25,8 @@ import com.google.common.base.Joiner;
 public class ClassificationItem {
 
 	private final String symbol;
-	private List<String> titleParts = new LinkedList<String>();
-	private List<ClassificationItem> subClasses = new LinkedList<ClassificationItem>();
+	private List<String> titleParts = new LinkedList<>();
+	private List<ClassificationItem> subClasses = new LinkedList<>();
 	
 	public ClassificationItem(String symbol){
 		this.symbol = symbol;

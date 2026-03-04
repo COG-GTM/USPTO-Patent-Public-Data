@@ -22,7 +22,7 @@ public abstract class PatentClassification implements Classification {
     private static Logger LOGGER = LoggerFactory.getLogger(PatentClassification.class);
 
 	private String originalText;
-	private Set<PatentClassification> children = new TreeSet<PatentClassification>();
+	private Set<PatentClassification> children = new TreeSet<>();
 	private Boolean isMainClassification;
 
 	@Override
@@ -65,13 +65,11 @@ public abstract class PatentClassification implements Classification {
 		return getChildBySymbol(symbol) != null;
 	}
 
-	public PatentClassification getChildBySymbol(String code) {	
-		for (PatentClassification classChild : this.children) {
-			if (classChild.getTextOriginal().equals(code)) {
-				return classChild;
-			}
-		}
-		return null;
+	public PatentClassification getChildBySymbol(String code) {
+		return children.stream()
+				.filter(classChild -> classChild.getTextOriginal().equals(code))
+				.findFirst()
+				.orElse(null);
 	}
 
 	/**
@@ -81,7 +79,7 @@ public abstract class PatentClassification implements Classification {
 	public int getDepth() {
 		String[] parts = getParts();
 		List<String> partList = Arrays.asList(parts);
-		return (int) partList.stream().filter(p -> Objects.nonNull(p)).count();
+		return (int) partList.stream().filter(Objects::nonNull).count();
 	}
 
 	/**
@@ -153,7 +151,7 @@ public abstract class PatentClassification implements Classification {
 	}
 
     public static <T extends PatentClassification> List<T> fromText(Iterable<String> classificationStrings, Class<T> classificationClass) {
-        List<T> retClasses = new ArrayList<T>();
+        List<T> retClasses = new ArrayList<>();
         for (String textClass : classificationStrings) {
             try {
                 T classification = classificationClass.newInstance();
@@ -182,10 +180,9 @@ public abstract class PatentClassification implements Classification {
 
     public static Set<String> getFacetByType(Collection<PatentClassification> classes, ClassificationType wantedType) {
         Set<PatentClassification> filtered = filter(classes, isType(wantedType));
-        Set<String> facets = new LinkedHashSet<String>();
-        for(PatentClassification clazz: filtered){
-            facets.addAll(Arrays.asList(clazz.toFacet()));
-        }
+        Set<String> facets = filtered.stream()
+                .flatMap(clazz -> Arrays.stream(clazz.toFacet()))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
         return facets;
     }
 }

@@ -18,7 +18,7 @@ public class OrgSynonymGeneratorTest {
 	 * Real Company Examples taken from Patent XML
 	 * synonyms are generate by removing company prefix and suffixes.
 	 */
-	private static Map<String, String> COMPANIES = new LinkedHashMap<String, String>();
+	private static Map<String, String> COMPANIES = new LinkedHashMap<>();
 	static {
 		COMPANIES.put("International Business Machines Corporation", "International Business Machines");
 		COMPANIES.put("Kabushiki Kaisha Toshiba", "Toshiba");
@@ -72,7 +72,7 @@ public class OrgSynonymGeneratorTest {
 		COMPANIES.put("Nerviano Medical Sciences S.r.l.", "Nerviano Medical Sciences");
 	}
 
-	private static List<String> COMPANIES_FALSE_POS = new ArrayList<String>();
+	private static List<String> COMPANIES_FALSE_POS = new ArrayList<>();
 	static {
 		COMPANIES_FALSE_POS.add("Deere & Company");
 		COMPANIES_FALSE_POS.add("Milliken & Company");

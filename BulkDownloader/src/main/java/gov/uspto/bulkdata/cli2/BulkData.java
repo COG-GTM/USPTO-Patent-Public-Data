@@ -105,7 +105,7 @@ public class BulkData {
 
     public DownloadJob downloadRandom(int limit) throws IOException {
         List<HttpUrl> urls = fetchLinks();
-        List<HttpUrl> randomUrls = new ArrayList<HttpUrl>();
+        List<HttpUrl> randomUrls = new ArrayList<>();
 
         Random random = new Random();
         for (int i = 0; i < limit; i++) {
@@ -155,7 +155,7 @@ public class BulkData {
     }
 
     private List<HttpUrl> fetchLinks() throws IOException {
-        List<HttpUrl> urls = new LinkedList<HttpUrl>();
+        List<HttpUrl> urls = new LinkedList<>();
         while (yearIterator.hasNext()) {
             String year = yearIterator.next();
             //String fileRegex = "[A-z]{3,6}" + yearMap.get(year) + ".*?" + "\\." + dataType.getSuffix() + "$";

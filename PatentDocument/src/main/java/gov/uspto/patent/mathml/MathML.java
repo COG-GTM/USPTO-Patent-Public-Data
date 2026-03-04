@@ -142,7 +142,7 @@ public class MathML {
     }
 
     private List<String> getValues(String mathMLString) {
-        List<String> values = new ArrayList<String>();
+        List<String> values = new ArrayList<>();
 
         @SuppressWarnings("unchecked")
         List<Node> textNodes = mathNode.selectNodes("//*[text()]");
@@ -158,7 +158,7 @@ public class MathML {
 
     public List<String> tokenize() {
         String mathMLString = parse(mathNode);
-        List<String> tokens = new ArrayList<String>();
+        List<String> tokens = new ArrayList<>();
         tokens.add(mathMLString);
         tokens.add(normalizeVariables(mathMLString));
         tokens.add(normalizeConstance(mathMLString));

@@ -29,7 +29,7 @@ public class ClaimNode extends DOMFragmentReader<List<Claim>> {
 
 	@Override
 	public List<Claim> read() {
-		List<Claim> claims = new ArrayList<Claim>();
+		List<Claim> claims = new ArrayList<>();
 
 		@SuppressWarnings("unchecked")
 		List<Node> claimNodes = document.selectNodes(PATENT_PATH);
@@ -47,7 +47,7 @@ public class ClaimNode extends DOMFragmentReader<List<Claim>> {
 		Claim claim;
 		List<Node> dependentN = claimNode.selectNodes("*/*/CLREF/@ID");
 		if (dependentN != null && !dependentN.isEmpty()) {
-			Set<String> dependentIds = new HashSet<String>();
+			Set<String> dependentIds = new HashSet<>();
 			for (Node refNode : dependentN) {
 				dependentIds.add(refNode.getText());
 			}

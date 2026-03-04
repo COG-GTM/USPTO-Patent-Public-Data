@@ -89,7 +89,7 @@ public class Download {
 
     public DownloadJob downloadRandom(int limit) throws IOException {
         List<HttpUrl> urls = fetchLinks(0);
-        List<HttpUrl> randomUrls = new ArrayList<HttpUrl>();
+        List<HttpUrl> randomUrls = new ArrayList<>();
 
         Random random = new Random();
         for (int i = 0; i < limit; i++) {
@@ -140,7 +140,7 @@ public class Download {
 
     private List<HttpUrl> fetchLinks() throws IOException {
         if (source.getDownload().getDownloadUrl() != null) {
-            List<HttpUrl> urls = new ArrayList<HttpUrl>(1);
+            List<HttpUrl> urls = new ArrayList<>(1);
             urls.add(source.getDownload().getDownloadUrl());
             return urls;
         }

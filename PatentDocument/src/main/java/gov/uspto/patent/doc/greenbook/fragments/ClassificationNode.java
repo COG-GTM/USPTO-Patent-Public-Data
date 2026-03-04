@@ -70,7 +70,7 @@ public class ClassificationNode extends DOMFragmentReader<Set<PatentClassificati
 
 	@Override
 	public Set<PatentClassification> read() {
-		Set<PatentClassification> classifications = new LinkedHashSet<PatentClassification>();
+		Set<PatentClassification> classifications = new LinkedHashSet<>();
 
 		@SuppressWarnings("unchecked")
 		List<Node> classNodes = document.selectNodes(FRAGMENT_PATH);
@@ -104,7 +104,7 @@ public class ClassificationNode extends DOMFragmentReader<Set<PatentClassificati
 	}
 
 	public Set<PatentClassification> getIPC(Node classN) {
-	    Set<PatentClassification> ipcClasses = new HashSet<PatentClassification>();
+	    Set<PatentClassification> ipcClasses = new HashSet<>();
 		List<Node> ipcNs = classN.selectNodes("ICL");
 
 		for(Node ipcN: ipcNs){

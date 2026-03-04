@@ -25,7 +25,7 @@ public class ApplicantNode extends DOMFragmentReader<List<Applicant>> {
 
 	@Override
 	public List<Applicant> read() {
-		List<Applicant> applicantList = new ArrayList<Applicant>();
+		List<Applicant> applicantList = new ArrayList<>();
 
 		@SuppressWarnings("unchecked")
 		List<Node> applNodes = document.selectNodes(FRAGMENT_PATH);
@@ -35,7 +35,7 @@ public class ApplicantNode extends DOMFragmentReader<List<Applicant>> {
 	}
 
 	private List<Applicant> readApplicants(List<Node> applicants) {
-		List<Applicant> applicantList = new ArrayList<Applicant>();
+		List<Applicant> applicantList = new ArrayList<>();
 
 		for (Node node : applicants) {
 			AddressBookNode addressBook = new AddressBookNode(node);

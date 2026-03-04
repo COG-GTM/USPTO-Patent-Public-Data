@@ -7,7 +7,7 @@ import gov.uspto.patent.InvalidDataException;
 
 public class Assignee extends Entity {
 	
-	public static final Map<String, String> AssigneeRoleType = new HashMap<String, String>();
+	public static final Map<String, String> AssigneeRoleType = new HashMap<>();
 	static {
 		AssigneeRoleType.put("01", "Unassigned");
 		AssigneeRoleType.put("02", "U.S. company or corporation");

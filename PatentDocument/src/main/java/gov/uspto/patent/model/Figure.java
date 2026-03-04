@@ -18,7 +18,7 @@ import gov.uspto.patent.TextField;
  */
 public class Figure implements TextField {
 
-	private Set<String> ids = new HashSet<String>();
+	private Set<String> ids = new HashSet<>();
 	private String rawText;
 
 	public Figure(String rawText, String... ids) {

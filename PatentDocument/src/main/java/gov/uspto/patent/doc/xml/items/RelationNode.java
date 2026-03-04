@@ -39,7 +39,7 @@ public class RelationNode extends ItemReader<List<DocumentId>> {
 
 	@Override
 	public List<DocumentId> read() {
-		List<DocumentId> docIds = new ArrayList<DocumentId>();
+		List<DocumentId> docIds = new ArrayList<>();
 		
 		Node parentN = itemNode.selectSingleNode(REL_PARENT);
 		DocumentId parentDocId = new DocumentIdNode(parentN).read();

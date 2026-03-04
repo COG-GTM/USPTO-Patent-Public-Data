@@ -9,7 +9,7 @@ import gov.uspto.common.text.StringCaseUtil;
 public abstract class Name {
 
 	private final String fullName;
-	private Set<String> synonym = new HashSet<String>(); // nickname, aliases, variants.
+	private Set<String> synonym = new HashSet<>(); // nickname, aliases, variants.
 	private String suffix; // LLP, LLC, Ltd; Dr.  
 
 	public Name(final String fullName){

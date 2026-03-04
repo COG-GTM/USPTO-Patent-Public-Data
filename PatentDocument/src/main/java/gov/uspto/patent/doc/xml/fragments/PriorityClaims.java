@@ -43,7 +43,7 @@ public class PriorityClaims extends DOMFragmentReader<List<DocumentId>> {
 
     @Override
     public List<DocumentId> read() {
-        List<DocumentId> priorityDocIds = new ArrayList<DocumentId>();
+        List<DocumentId> priorityDocIds = new ArrayList<>();
 
         List<Node> fragmentNodes = document.selectNodes(FRAGMENT_PATH);
         for (Node fragNode : fragmentNodes) {       	

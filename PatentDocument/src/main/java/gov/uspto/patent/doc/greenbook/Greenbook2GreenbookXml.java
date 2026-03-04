@@ -26,7 +26,7 @@ import gov.uspto.patent.PatentReaderException;
 public class Greenbook2GreenbookXml {
 
     /*
-	private static final Set<String> SECTIONS = new HashSet<String>(20);
+	private static final Set<String> SECTIONS = new HashSet<>(20);
 	static {
 		SECTIONS.add("PATN");
 		SECTIONS.add("INVT");

@@ -26,7 +26,7 @@ public class ExaminerNode extends DOMFragmentReader<List<Examiner>> {
 
 	@Override
 	public List<Examiner> read() {
-		List<Examiner> examinerList = new ArrayList<Examiner>();
+		List<Examiner> examinerList = new ArrayList<>();
 
 		Examiner primary = readPrimaryExaminer();
 		if (primary != null) {

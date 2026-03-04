@@ -22,7 +22,7 @@ import org.xml.sax.SAXException;
 public class PatternMatcher {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PatternMatcher.class);
 
-	private List<XPathMatch> patterns = new ArrayList<XPathMatch>();
+	private List<XPathMatch> patterns = new ArrayList<>();
 	private DocumentBuilder docBuilder;
 	private XPathMatch lastMatchedPattern;
 

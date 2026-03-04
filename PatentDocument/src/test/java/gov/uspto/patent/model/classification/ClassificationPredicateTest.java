@@ -67,7 +67,7 @@ public class ClassificationPredicateTest {
 		cpc1.parseText("D07B22012051");
 		CpcClassification cpc2 = new CpcClassification();
 		cpc2.parseText("A01B300");
-		Set<CpcClassification> cpcClasses = new HashSet<CpcClassification>();
+		Set<CpcClassification> cpcClasses = new HashSet<>();
 		cpcClasses.add(cpc1);
 		cpcClasses.add(cpc2);
 		

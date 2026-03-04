@@ -12,7 +12,7 @@ import org.junit.Test;
 
 public class CpCClassificationTest {
 
-	private static Map<String, String> validFromTo = new LinkedHashMap<String, String>();
+	private static Map<String, String> validFromTo = new LinkedHashMap<>();
 	static {
 		validFromTo.put("A01B300", "A01B 3/00");
 		validFromTo.put("A01B3/00", "A01B 3/00");

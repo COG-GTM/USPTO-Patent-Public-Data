@@ -21,7 +21,7 @@ public class ClassificationNode extends DOMFragmentReader<Set<PatentClassificati
 	private static final String IPC_PATH = "/patent-application-publication/subdoc-bibliographic-information/technical-information/classification-ipc";
 	private static final String USPC_PATH = "/patent-application-publication/subdoc-bibliographic-information/technical-information/classification-us";
 
-	private Set<PatentClassification> classifications = new LinkedHashSet<PatentClassification>();
+	private Set<PatentClassification> classifications = new LinkedHashSet<>();
 
 	public ClassificationNode(Document document) {
 		super(document);

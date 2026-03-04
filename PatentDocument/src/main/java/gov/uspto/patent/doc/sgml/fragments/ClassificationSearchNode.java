@@ -40,7 +40,7 @@ public class ClassificationSearchNode extends DOMFragmentReader<Set<PatentClassi
 
 	@Override
 	public Set<PatentClassification> read() {
-		Set<PatentClassification> classifications = new HashSet<PatentClassification>();
+		Set<PatentClassification> classifications = new HashSet<>();
 
 		// IPC classification.
 		@SuppressWarnings("unchecked")

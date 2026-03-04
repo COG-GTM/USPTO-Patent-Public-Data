@@ -43,7 +43,7 @@ public class DotCodes {
 		return df.format(fraction1);
 	}
 
-	private static final HashMap<String, Character> NAME_TO_UNICODE = new HashMap<String, Character>();
+	private static final HashMap<String, Character> NAME_TO_UNICODE = new HashMap<>();
 	static {
 		// Trademark and Copyright
 		NAME_TO_UNICODE.put(".TM.", '\u2122'); // trademark

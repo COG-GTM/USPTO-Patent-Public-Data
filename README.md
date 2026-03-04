@@ -3,7 +3,17 @@
 Tool kit to download, read, and utilize open patent data provided to the public.
 
 ### Notice
-This source code is a work in progress and has not been fully vetted for a production environment. 
+This source code is a work in progress and has not been fully vetted for a production environment.
+
+### Prerequisites
+- **Java 8** (JDK 1.8) or higher is required to build and run this project.
+- **Apache Maven** 3.x is required for building.
+
+### Setup and Build
+1. Ensure Java 8 JDK is installed: `java -version` should show `1.8.x` or higher.
+2. Clone the repository: `git clone https://github.com/COG-GTM/USPTO-Patent-Public-Data.git`
+3. Build the project: `mvn clean compile`
+4. Run the test suite: `mvn test` 
 
 ### Two main modules
 <ul>

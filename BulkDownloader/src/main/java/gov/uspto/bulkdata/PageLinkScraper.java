@@ -76,7 +76,7 @@ public class PageLinkScraper {
      * @throws IOException
      */
     public List<HttpUrl> fetchLinks(HttpUrl url, String linkPrefix, String suffix) throws IOException {
-        List<HttpUrl> list = new ArrayList<HttpUrl>();
+        List<HttpUrl> list = new ArrayList<>();
 
         //String matchPrefix = "/?" + linkPrefix;
 
@@ -141,7 +141,7 @@ public class PageLinkScraper {
     }
 
     public List<HttpUrl> fetchLinks(Source source) throws IOException { // method currently used by Download class.
-        List<HttpUrl> list = new ArrayList<HttpUrl>();
+        List<HttpUrl> list = new ArrayList<>();
                
         Request request = new Request.Builder().url(source.getDownload().getScrapeUrl()).build();
         Response response = client.newCall(request).execute();
@@ -184,7 +184,7 @@ public class PageLinkScraper {
     
     public List<HttpUrl> fetchLinks(HttpUrl url, List<DateRange> dateMatches, String suffix) throws IOException { 
         // method currently used by BulkData class.
-        List<HttpUrl> list = new ArrayList<HttpUrl>();
+        List<HttpUrl> list = new ArrayList<>();
 
         Request request = new Request.Builder().url(url).build();
         Response response = client.newCall(request).execute();

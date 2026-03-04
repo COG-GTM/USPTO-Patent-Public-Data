@@ -130,7 +130,7 @@ public class CssBrs extends KvParser {
 
         File inputFile = new File(args[0]);
 
-        List<FieldGroup> fieldGroups = new ArrayList<FieldGroup>();
+        List<FieldGroup> fieldGroups = new ArrayList<>();
         fieldGroups.add(new FieldGroup("APPLICANT").addField("AANM", true).addField("AACI", "AAST", "AAZP", "AACO",
                 "AATX", "AAGP", "AAAT"));
         fieldGroups.add(new FieldGroup("INVENTOR").addField("INNM", true).addField("INSA", "INCI", "INST", "INZP",

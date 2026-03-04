@@ -119,7 +119,7 @@ public class JsonMapper implements DocumentBuilder<Patent> {
 
     
     public String getPrettyPrint(JsonObject jsonObject) throws IOException {
-        Map<String, Boolean> config = new HashMap<String, Boolean>();
+        Map<String, Boolean> config = new HashMap<>();
         config.put(JsonGenerator.PRETTY_PRINTING, true);
 
         JsonWriterFactory writerFactory = Json.createWriterFactory(config);

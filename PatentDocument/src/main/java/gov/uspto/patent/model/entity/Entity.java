@@ -14,7 +14,7 @@ public abstract class Entity {
 
 	private final EntityType entityType;
 	private final Name name;
-	private final List<EntityRelationship> relations = new ArrayList<EntityRelationship>();
+	private final List<EntityRelationship> relations = new ArrayList<>();
     private final Address address; 
 
 	public Entity(EntityType type, Name name, Address address){

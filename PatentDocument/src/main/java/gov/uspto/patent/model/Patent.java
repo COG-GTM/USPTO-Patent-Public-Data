@@ -42,10 +42,10 @@ public abstract class Patent {
 
     private PatentCorpus patentCorpus;
     private DocumentId documentId;
-    private Set<DocumentId> priorityIds = new TreeSet<DocumentId>();
-    private Set<DocumentId> otherIds = new TreeSet<DocumentId>();
-    private Set<DocumentId> relationIds = new TreeSet<DocumentId>();
-    private Set<DocumentId> referenceIds = new TreeSet<DocumentId>();
+    private Set<DocumentId> priorityIds = new TreeSet<>();
+    private Set<DocumentId> otherIds = new TreeSet<>();
+    private Set<DocumentId> relationIds = new TreeSet<>();
+    private Set<DocumentId> referenceIds = new TreeSet<>();
 
     private DocumentDate datePublished;
     private DocumentDate dateProduced;
@@ -54,15 +54,15 @@ public abstract class Patent {
     private Abstract abstractText;
     private Description description;
 
-    private List<Citation> citations = new ArrayList<Citation>();
-    private Set<PatentClassification> classifications = new HashSet<PatentClassification>();
-    private List<Claim> claims = new ArrayList<Claim>();
+    private List<Citation> citations = new ArrayList<>();
+    private Set<PatentClassification> classifications = new HashSet<>();
+    private List<Claim> claims = new ArrayList<>();
 
-    private List<Inventor> inventors = new ArrayList<Inventor>();
-    private List<Assignee> assignees = new ArrayList<Assignee>();
-    private List<Applicant> applicants = new ArrayList<Applicant>();
-    private List<Agent> agents = new ArrayList<Agent>();
-    private List<Examiner> examiners = new ArrayList<Examiner>();
+    private List<Inventor> inventors = new ArrayList<>();
+    private List<Assignee> assignees = new ArrayList<>();
+    private List<Applicant> applicants = new ArrayList<>();
+    private List<Agent> agents = new ArrayList<>();
+    private List<Examiner> examiners = new ArrayList<>();
     private DocumentId applicationId;
 
     private List<ChemicalFormula> chemFomulas;
@@ -78,24 +78,24 @@ public abstract class Patent {
     public void reset() {
         // patentCorpus = null;
         // patentType = null;
-        priorityIds = new TreeSet<DocumentId>();
-        otherIds = new TreeSet<DocumentId>();
-        relationIds = new TreeSet<DocumentId>();
-        referenceIds = new TreeSet<DocumentId>();
+        priorityIds = new TreeSet<>();
+        otherIds = new TreeSet<>();
+        relationIds = new TreeSet<>();
+        referenceIds = new TreeSet<>();
         datePublished = null;
         dateProduced = null;
         applicationId = null;
         title = null;
         abstractText = null;
         description = null;
-        citations = new ArrayList<Citation>();
-        classifications = new HashSet<PatentClassification>();
-        claims = new ArrayList<Claim>();
-        inventors = new ArrayList<Inventor>();
-        assignees = new ArrayList<Assignee>();
-        applicants = new ArrayList<Applicant>();
-        agents = new ArrayList<Agent>();
-        examiners = new ArrayList<Examiner>();
+        citations = new ArrayList<>();
+        classifications = new HashSet<>();
+        claims = new ArrayList<>();
+        inventors = new ArrayList<>();
+        assignees = new ArrayList<>();
+        applicants = new ArrayList<>();
+        agents = new ArrayList<>();
+        examiners = new ArrayList<>();
         chemFomulas = null;
         mathFormulas = null;
     }

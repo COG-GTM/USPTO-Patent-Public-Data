@@ -21,7 +21,7 @@ public class MasterCpcCsvBuilder implements DocumentBuilder<MasterClassification
     }
 
     public List<String> build(MasterClassificationRecord record) {
-        List<String> ret = new ArrayList<String>();
+        List<String> ret = new ArrayList<>();
 
         String appNum = record.getAppId().getDocNumber();
         String appCC = record.getAppId().getCountryCode().toString();

@@ -29,7 +29,7 @@ public class ClassificationTokenizer {
 	 * </pre>
 	 */
 	public static String[] partsToFacet(String... parts) {
-		List<String> facets = new LinkedList<String>();
+		List<String> facets = new LinkedList<>();
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < parts.length; i++) {
 			if (parts[i] == null) {
@@ -48,7 +48,7 @@ public class ClassificationTokenizer {
 			facets.set(k, k + "/" + facets.get(k));
 		}
 
-		Set<String> facetSet = new LinkedHashSet<String>(facets.size());
+		Set<String> facetSet = new LinkedHashSet<>(facets.size());
 		facetSet.addAll(facets);
 		return facetSet.toArray(new String[facetSet.size()]);
 	}
@@ -60,7 +60,7 @@ public class ClassificationTokenizer {
 	 * "0/D01", "1/D01/D01101000", "2/D01/D01101000/D01102000"
 	 */
 	public static List<String> parseFacets(String facet) {
-		List<String> sections = new ArrayList<String>();
+		List<String> sections = new ArrayList<>();
 
 		String[] subc = facet.split("/");
 		subc[0] = ""; // clear off the leading number.
@@ -97,7 +97,7 @@ public class ClassificationTokenizer {
 	 * @return // {A45B1700, E04H122284}
 	 */
 	public static List<String> getMostSpecificClasses(List<String> facets) {
-		List<String> leafClasses = new ArrayList<String>();
+		List<String> leafClasses = new ArrayList<>();
 
 		String largestNode = facets.get(facets.size() - 1).split("/")[0];
 		for (int i = facets.size() - 1; i > 0; i--) {

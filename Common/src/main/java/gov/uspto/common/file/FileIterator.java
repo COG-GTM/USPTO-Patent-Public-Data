@@ -66,7 +66,7 @@ public class FileIterator {
      * @return
      */
     private static Iterator<File> getFileIterator(Collection<String> fileNames) throws FileNotFoundException {
-        List<File> filenames = new ArrayList<File>(fileNames.size());
+        List<File> filenames = new ArrayList<>(fileNames.size());
         for (String filename : fileNames) {
             File file = new File(filename);
             if (file.isFile() && file.canRead()) {

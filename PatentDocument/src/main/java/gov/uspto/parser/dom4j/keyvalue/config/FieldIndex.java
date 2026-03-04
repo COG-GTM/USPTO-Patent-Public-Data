@@ -25,7 +25,7 @@ public class FieldIndex {
     }
 
     private Map<String, IndexEntry> generateFieldIndex(List<FieldGroup> fieldGroups) {
-        Map<String, IndexEntry> index = new HashMap<String, IndexEntry>();
+        Map<String, IndexEntry> index = new HashMap<>();
         for (FieldGroup group : fieldGroups) {
             for (Field field : group.getFields()) {
                 if (index.containsKey(field.getName())){

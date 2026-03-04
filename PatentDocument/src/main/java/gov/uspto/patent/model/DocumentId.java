@@ -1,10 +1,10 @@
 package gov.uspto.patent.model;
 
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -218,15 +218,9 @@ public class DocumentId implements Comparable<DocumentId> {
     }
 
     public static List<DocumentId> getByType(Collection<DocumentId> docIds, DocumentIdType type) {
-        List<DocumentId> redIds = new LinkedList<DocumentId>();
-
-        for (DocumentId docId : docIds) {
-            if (docId != null && docId.getType() == type) {
-                redIds.add(docId);
-            }
-        }
-
-        return redIds;
+        return docIds.stream()
+                .filter(docId -> docId != null && docId.getType() == type)
+                .collect(Collectors.toList());
     }
 
     @Override

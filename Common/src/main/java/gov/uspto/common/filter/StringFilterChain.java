@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class StringFilterChain implements StringFilter {
 
-    public List<StringFilter> filters = new ArrayList<StringFilter>();
+    public List<StringFilter> filters = new ArrayList<>();
 
     public void addRule(StringFilter... rules) {
         for (StringFilter rule : rules) {

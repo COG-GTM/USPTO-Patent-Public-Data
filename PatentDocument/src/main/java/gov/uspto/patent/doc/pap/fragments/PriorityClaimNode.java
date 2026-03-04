@@ -25,7 +25,7 @@ public class PriorityClaimNode extends DOMFragmentReader<List<DocumentId>> {
 
 	@Override
 	public List<DocumentId> read() {
-		List<DocumentId> priorityIds = new ArrayList<DocumentId>();
+		List<DocumentId> priorityIds = new ArrayList<>();
 
 		List<Node> nodes = document.selectNodes(FRAGMENT_PATH);
 		if (nodes == null) {

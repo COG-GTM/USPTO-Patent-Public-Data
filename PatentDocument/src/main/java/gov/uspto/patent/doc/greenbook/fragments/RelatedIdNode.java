@@ -26,7 +26,7 @@ public class RelatedIdNode extends DOMFragmentReader<List<DocumentId>> {
 
 	@Override
 	public List<DocumentId> read() {
-		List<DocumentId> familyDocIds = new ArrayList<DocumentId>();
+		List<DocumentId> familyDocIds = new ArrayList<>();
 
 		@SuppressWarnings("unchecked")
 		List<Node> relNodes = document.selectNodes(RELATED);

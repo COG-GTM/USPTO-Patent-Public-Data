@@ -33,7 +33,7 @@ public class ExaminerNode extends DOMFragmentReader<List<Examiner>> {
 			return null;
 		}
 
-		List<Examiner> examinerList = new ArrayList<Examiner>();
+		List<Examiner> examinerList = new ArrayList<>();
 
 		Node primaryExaminerN = examiner.selectSingleNode("B746");
 		Examiner primaryExaminer = getExaminer(primaryExaminerN, ExaminerType.PRIMARY);

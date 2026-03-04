@@ -72,7 +72,7 @@ public class AddressBookNode extends ItemReader<Name> {
 
         @SuppressWarnings("unchecked")
         List<Node> synonymNodes = itemNode.selectNodes("synonym");
-        Set<String> synonyms = new HashSet<String>(synonymNodes.size());
+        Set<String> synonyms = new HashSet<>(synonymNodes.size());
         for (Node synonymN : synonymNodes) {
             synonyms.add(synonymN.getText());
         }
@@ -101,7 +101,7 @@ public class AddressBookNode extends ItemReader<Name> {
 
         @SuppressWarnings("unchecked")
         List<Node> synonymNodes = itemNode.selectNodes("synonym");
-        Set<String> synonyms = new HashSet<String>(synonymNodes.size());
+        Set<String> synonyms = new HashSet<>(synonymNodes.size());
         for (Node synonymN : synonymNodes) {
             synonyms.add(synonymN.getText());
         }

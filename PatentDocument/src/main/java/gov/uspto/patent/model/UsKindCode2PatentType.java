@@ -25,7 +25,7 @@ public class UsKindCode2PatentType {
     }
 
     private void init(){
-        mapping = new HashMap<String, PatentType>();
+        mapping = new HashMap<>();
 
         // UTILITY
         mapping.put("A", PatentType.UTILITY);

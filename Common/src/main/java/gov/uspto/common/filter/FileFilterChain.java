@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class FileFilterChain implements FileFilter {
 
-    public List<FileFilter> matchRules = new ArrayList<FileFilter>();
+    public List<FileFilter> matchRules = new ArrayList<>();
 
     public void addRule(FileFilter... rules) {
         for (FileFilter rule : rules) {

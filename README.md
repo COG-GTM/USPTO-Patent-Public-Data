@@ -5,6 +5,10 @@ Tool kit to download, read, and utilize open patent data provided to the public.
 ### Notice
 This source code is a work in progress and has not been fully vetted for a production environment. 
 
+### Requirements
+- **Java 21** or higher
+- **Maven 3.9+**
+
 ### Two main modules
 <ul>
 <li><b><a href="https://github.com/USPTO/PatentPublicData/tree/master/BulkDownloader">Bulk Downloader</a></b> automates downloading of public bulk patent data</li>

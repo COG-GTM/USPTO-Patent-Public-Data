@@ -104,7 +104,7 @@ public class CpcMasterReader implements PatentDocReader<MasterClassificationReco
 	}
 
 	public List<CpcClassification> readCPC(Node node) {
-		List<CpcClassification> cpcClasses = new ArrayList<CpcClassification>();
+		List<CpcClassification> cpcClasses = new ArrayList<>();
 		Node mainN = node.selectSingleNode("pat:MainCPC");
 
 		CpcClassification mainCpc = readClass(mainN);

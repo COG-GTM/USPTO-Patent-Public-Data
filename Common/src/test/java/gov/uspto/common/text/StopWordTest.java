@@ -48,7 +48,7 @@ public class StopWordTest {
 
 	@Test
 	public void stopWordContainedList() throws IOException {
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		list.add("the");
 		list.add("mountain");
 		assertTrue(stopword.contains(list));
@@ -155,7 +155,7 @@ public class StopWordTest {
 
 	@Test
 	public void stopWordTrailingArrayFalse() throws IOException {
-		List<String> newList = new ArrayList<String>();
+		List<String> newList = new ArrayList<>();
 		newList.add("mountain");
 		newList.add("tall");
 		assertFalse(stopword.hasTrailing(newList));
@@ -163,7 +163,7 @@ public class StopWordTest {
 
 	@Test
 	public void stopWordTrailingArrayTrue() throws IOException {
-		List<String> newList = new ArrayList<String>();
+		List<String> newList = new ArrayList<>();
 		newList.add("mountain");
 		newList.add("this");
 		assertFalse(stopword.hasTrailing(newList));
@@ -186,7 +186,7 @@ public class StopWordTest {
 
 	@Test
 	public void stopWordEdgeArrayFalse() throws IOException {
-		List<String> newList = new ArrayList<String>();
+		List<String> newList = new ArrayList<>();
 		newList.add("mountain");
 		newList.add("tall");
 		assertFalse(stopword.hasEdge(newList));
@@ -194,7 +194,7 @@ public class StopWordTest {
 
 	@Test
 	public void stopWordEdgeArrayTrue() throws IOException {
-		List<String> newList = new ArrayList<String>();
+		List<String> newList = new ArrayList<>();
 		newList.add("mountain");
 		newList.add("this");
 		assertFalse(stopword.hasEdge(newList));

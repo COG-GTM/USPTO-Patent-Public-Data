@@ -70,7 +70,7 @@ public class CpcXmlParser {
 
 		String symbol = classItemNode.selectSingleNode("classification-symbol").getText();
 
-		List<String> titlePartsText = new LinkedList<String>();
+		List<String> titlePartsText = new LinkedList<>();
 
 		List<Node> titleParts = classItemNode.selectNodes("class-title/title-part");
 		

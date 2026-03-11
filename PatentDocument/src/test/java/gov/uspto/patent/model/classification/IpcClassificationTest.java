@@ -13,7 +13,7 @@ import gov.uspto.patent.model.classification.IpcClassification;
 
 public class IpcClassificationTest {
 
-	private static Map<String, String> validFromTo = new LinkedHashMap<String, String>();
+	private static Map<String, String> validFromTo = new LinkedHashMap<>();
 	static {
 		validFromTo.put("C 07D 4 3/02", "C07D 403/02");
 		validFromTo.put("H01S 3/00", "H01S 3/00");

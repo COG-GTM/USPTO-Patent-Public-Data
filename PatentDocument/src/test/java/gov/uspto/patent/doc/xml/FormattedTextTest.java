@@ -33,7 +33,7 @@ public class FormattedTextTest {
 
 	@Test
 	public void pLevel(){
-		Map<String, String> variations = new HashMap<String, String>();
+		Map<String, String> variations = new HashMap<>();
 		variations.put("<p lvl=\"1\"></p>", "<p level=\"1\"></p>");
 		variations.put("<p level=\"1\"></p>", "<p level=\"1\"></p>");
 
@@ -56,7 +56,7 @@ public class FormattedTextTest {
 
 	@Test
 	public void tailingEntityText() {
-		Map<String, String> variations = new HashMap<String, String>();
+		Map<String, String> variations = new HashMap<>();
 		variations.put("<figref idref=\"DRAWINGS\">FIG. 1</figref><i>a</i>", "<a idref=\"FIG-1\" id=\"FR-0001\" class=\"figref\">FIG. 1a</a>");
 		variations.put("(<figref idref=\"DRAWINGS\">FIG. 1</figref>a)", "(<a idref=\"FIG-1\" id=\"FR-0001\" class=\"figref\">FIG. 1a</a>)");
 		variations.put("<figref idref=\"DRAWINGS\">FIG. 1</figref>a;", "<a idref=\"FIG-1\" id=\"FR-0001\" class=\"figref\">FIG. 1a</a>;");
@@ -73,7 +73,7 @@ public class FormattedTextTest {
 
 	@Test
 	public void tailingFigrefs() {
-		Map<String, String> variations = new HashMap<String, String>();
+		Map<String, String> variations = new HashMap<>();
 		
 		variations.put(
 				"<figref idref=\"DRAWINGS\">FIGS. 1</figref>, <b>2</b> and <b>3</b>c", 

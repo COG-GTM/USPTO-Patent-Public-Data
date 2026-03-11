@@ -18,13 +18,11 @@ import gov.uspto.patent.TextField;
  */
 public class Figure implements TextField {
 
-	private Set<String> ids = new HashSet<String>();
+	private Set<String> ids = new HashSet<>();
 	private String rawText;
 
 	public Figure(String rawText, String... ids) {
-		for(String id: ids){
-			this.ids.add(id);
-		}
+		java.util.Collections.addAll(this.ids, ids);
 		this.rawText = rawText;
 	}
 

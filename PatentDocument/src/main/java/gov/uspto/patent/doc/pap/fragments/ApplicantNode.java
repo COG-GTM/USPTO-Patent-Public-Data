@@ -37,7 +37,7 @@ public class ApplicantNode extends DOMFragmentReader<List<Applicant>> {
 
 	@Override
 	public List<Applicant> read() {
-	    applicantList = new ArrayList<Applicant>();
+	    applicantList = new ArrayList<>();
 
 		@SuppressWarnings("unchecked")
 		List<Node> inventors = document.selectNodes(FRAGMENT_PATH1);

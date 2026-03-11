@@ -30,7 +30,7 @@ public class ClassificationSearchNode extends DOMFragmentReader<Set<PatentClassi
 
 		@Override
 		public Set<PatentClassification> read() {
-			Set<PatentClassification> classifications = new HashSet<PatentClassification>();
+			Set<PatentClassification> classifications = new HashSet<>();
 			
 			@SuppressWarnings("unchecked")
 			List<Node> nationalN = parentPath.selectNodes("classification-national");

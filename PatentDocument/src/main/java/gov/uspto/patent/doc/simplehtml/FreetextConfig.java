@@ -14,9 +14,9 @@ import java.util.Map;
  */
 public class FreetextConfig {
 
-    private Map<String, String> replacements = new HashMap<String, String>();
-    private Collection<String> remove = new HashSet<String>();
-    private Collection<HtmlFieldType> removeTypes = new HashSet<HtmlFieldType>();
+    private Map<String, String> replacements = new HashMap<>();
+    private Collection<String> remove = new HashSet<>();
+    private Collection<HtmlFieldType> removeTypes = new HashSet<>();
     private boolean wrapText = false;
     private int wrapWidth = 0;
 

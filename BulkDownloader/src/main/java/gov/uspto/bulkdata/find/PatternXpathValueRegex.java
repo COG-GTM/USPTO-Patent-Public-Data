@@ -17,7 +17,7 @@ import com.google.common.base.Preconditions;
 
 public class PatternXpathValueRegex extends MatchXPath {
 
-	private List<Pattern> regexs = new ArrayList<Pattern>();
+	private List<Pattern> regexs = new ArrayList<>();
 	private Pattern pattern = Pattern.compile("");
 	private XPathExpression xPathExpression;
 

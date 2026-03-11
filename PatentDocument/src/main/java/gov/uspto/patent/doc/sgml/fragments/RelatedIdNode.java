@@ -20,7 +20,7 @@ import gov.uspto.patent.model.DocumentIdType;
 public class RelatedIdNode extends DOMFragmentReader<List<DocumentId>> {
     private static final String FRAGMENT_PATH = "/PATDOC/SDOBI/B600";
 
-    List<DocumentId> docIds = new ArrayList<DocumentId>();
+    List<DocumentId> docIds = new ArrayList<>();
 
     public RelatedIdNode(Document document) {
         super(document);

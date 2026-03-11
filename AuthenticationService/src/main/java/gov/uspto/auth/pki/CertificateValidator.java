@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -135,7 +136,7 @@ public class CertificateValidator implements AuthenticatorValidator<X509Certific
      */
     private boolean validateValidity(X509Certificate certificate, List<String> violations) {
         try {
-            Date now = new Date();
+            Instant now = Instant.now();
             Date notBefore = certificate.getNotBefore();
             Date notAfter = certificate.getNotAfter();
 
@@ -149,17 +150,17 @@ public class CertificateValidator implements AuthenticatorValidator<X509Certific
                 return false;
             }
 
-            if (now.before(notBefore)) {
+            if (now.isBefore(notBefore.toInstant())) {
                 violations.add("Certificate is not yet valid (notBefore: " + notBefore + ")");
                 return false;
             }
 
-            if (now.after(notAfter)) {
+            if (now.isAfter(notAfter.toInstant())) {
                 violations.add("Certificate has expired (notAfter: " + notAfter + ")");
                 return false;
             }
 
-            certificate.checkValidity(now);
+            certificate.checkValidity(Date.from(now));
             LOGGER.debug("Certificate validity period validation passed");
             return true;
 

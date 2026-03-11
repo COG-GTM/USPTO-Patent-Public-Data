@@ -40,7 +40,7 @@ public class PatentValidator {
 	}
 
 	public static PatentValidator allRules() {
-		List<Validator<Patent>> rules = new ArrayList<Validator<Patent>>();
+		List<Validator<Patent>> rules = new ArrayList<>();
 		rules.add(new TitleRule());
 		rules.add(new AbstractRule());
 		rules.add(new DescriptionRule());

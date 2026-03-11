@@ -8,10 +8,10 @@ import com.google.common.base.Joiner;
 
 public class StringCaseUtil {
 
-	private static Set<String> lowerCaseWords = new HashSet<String>();
-	private static Set<String> prefixes = new HashSet<String>();
-	private static Set<String> lowerTrailHyphen = new HashSet<String>();
-	private static Set<String> prepositions = new HashSet<String>();
+	private static Set<String> lowerCaseWords = new HashSet<>();
+	private static Set<String> prefixes = new HashSet<>();
+	private static Set<String> lowerTrailHyphen = new HashSet<>();
+	private static Set<String> prepositions = new HashSet<>();
 
 	static {
 		prepositions.addAll(Arrays.asList(new String[] { "As", "At", "But", "By", "For", "From", "In", "Into", "Of", "Off", "On", "Onto", "To", "Up",

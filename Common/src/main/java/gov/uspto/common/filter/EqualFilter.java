@@ -13,12 +13,7 @@ public class EqualFilter implements FileFilter, StringFilter {
 
     @Override
     public boolean accept(String valueStr) {
-        for (String wantedValue : wanted) {
-            if (wantedValue.equals(valueStr)) {
-                return true;
-            }
-        }
-        return false;
+        return Arrays.stream(wanted).anyMatch(w -> w.equals(valueStr));
     }
 
     @Override

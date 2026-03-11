@@ -22,7 +22,7 @@ public abstract class PatentClassification implements Classification {
     private static Logger LOGGER = LoggerFactory.getLogger(PatentClassification.class);
 
 	private String originalText;
-	private Set<PatentClassification> children = new TreeSet<PatentClassification>();
+	private Set<PatentClassification> children = new TreeSet<>();
 	private Boolean isMainClassification;
 
 	@Override
@@ -153,7 +153,7 @@ public abstract class PatentClassification implements Classification {
 	}
 
     public static <T extends PatentClassification> List<T> fromText(Iterable<String> classificationStrings, Class<T> classificationClass) {
-        List<T> retClasses = new ArrayList<T>();
+        List<T> retClasses = new ArrayList<>();
         for (String textClass : classificationStrings) {
             try {
                 T classification = classificationClass.newInstance();
@@ -182,7 +182,7 @@ public abstract class PatentClassification implements Classification {
 
     public static Set<String> getFacetByType(Collection<PatentClassification> classes, ClassificationType wantedType) {
         Set<PatentClassification> filtered = filter(classes, isType(wantedType));
-        Set<String> facets = new LinkedHashSet<String>();
+        Set<String> facets = new LinkedHashSet<>();
         for(PatentClassification clazz: filtered){
             facets.addAll(Arrays.asList(clazz.toFacet()));
         }

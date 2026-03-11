@@ -21,7 +21,7 @@ public class DescriptionFigures extends ItemReader<List<Figure>> {
 	@Override
 	public List<Figure> read() {
 		String id =null;
-		List<Figure> figures = new ArrayList<Figure>();
+		List<Figure> figures = new ArrayList<>();
 		List<Node> childNodes = DescriptionNode.getSectionNodes(itemNode, "brief-description-of-drawings");
 		for(Node childN: childNodes){
 			if ("description-of-drawings".equals(childN.getName())){

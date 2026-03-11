@@ -14,7 +14,7 @@ import gov.uspto.patent.model.DocumentId;
 
 public class DocumentIdTest {
 
-    private static Map<String, String> validFromTo = new LinkedHashMap<String, String>();
+    private static Map<String, String> validFromTo = new LinkedHashMap<>();
     static {
         validFromTo.put("US2002/0097953A1", "US97953A1");
         validFromTo.put("US5973683A", "US5973683A");

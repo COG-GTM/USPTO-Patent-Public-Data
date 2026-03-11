@@ -34,7 +34,7 @@ public class InventorNode extends DOMFragmentReader<List<Inventor>> {
 
     @Override
     public List<Inventor> read() {
-        List<Inventor> inventorList = new ArrayList<Inventor>();
+        List<Inventor> inventorList = new ArrayList<>();
 
         @SuppressWarnings("unchecked")
         List<Node> applicants = document.selectNodes(FRAGMENT_PATH_APPLICANT);
@@ -75,7 +75,7 @@ public class InventorNode extends DOMFragmentReader<List<Inventor>> {
      * @return
      */
     private List<Inventor> readApplicantInventors(List<Node> applicants) {
-        List<Inventor> inventorList = new ArrayList<Inventor>();
+        List<Inventor> inventorList = new ArrayList<>();
 
         for (Node node : applicants) {
             String appType = ((Element) node).attribute("app-type").getValue();
@@ -91,7 +91,7 @@ public class InventorNode extends DOMFragmentReader<List<Inventor>> {
     }
 
     private List<Inventor> readInventors(List<Node> inventors) {
-        List<Inventor> inventorList = new ArrayList<Inventor>();
+        List<Inventor> inventorList = new ArrayList<>();
 
         for (Node node : inventors) {
             Inventor inventor = readInventor(node);

@@ -15,7 +15,7 @@ public class DescriptionFiguresTest {
 	@Test
 	public void extractFigDesc1() {
 		String pargraphText = "FIG. 1 is a partial perspective view of a person wearing a suitcoat.";
-		List<Figure> figures = new ArrayList<Figure>();
+		List<Figure> figures = new ArrayList<>();
 		DescriptionFigures.findFigures(pargraphText, figures);
 		Figure fig1 = figures.get(0);
 		Set<String> ids = fig1.getIds();
@@ -27,7 +27,7 @@ public class DescriptionFiguresTest {
 	@Test
 	public void extractFigDesc2() {
 		String pargraphText = "Image 1 is a partial perspective view of a person wearing a suitcoat.";
-		List<Figure> figures = new ArrayList<Figure>();
+		List<Figure> figures = new ArrayList<>();
 		DescriptionFigures.findFigures(pargraphText, figures);
 		assertTrue(figures.isEmpty());
 	}
@@ -35,7 +35,7 @@ public class DescriptionFiguresTest {
 	@Test
 	public void extractFigDesc3() {
 		String pargraphText = "";
-		List<Figure> figures = new ArrayList<Figure>();
+		List<Figure> figures = new ArrayList<>();
 		DescriptionFigures.findFigures(pargraphText, figures);
 		assertTrue(figures.isEmpty());
 	}
@@ -43,7 +43,7 @@ public class DescriptionFiguresTest {
 	@Test
 	public void extractFigDesc4() {
 		String pargraphText = "FIG. 1";
-		List<Figure> figures = new ArrayList<Figure>();
+		List<Figure> figures = new ArrayList<>();
 		DescriptionFigures.findFigures(pargraphText, figures);
 		assertTrue(figures.isEmpty());
 	}
@@ -51,7 +51,7 @@ public class DescriptionFiguresTest {
 	@Test
 	public void mentionalAnother() {
 		String pargraphText = "FIG. 3 is a cross-sectional view similar to that shown in FIG. 2 wherein the";
-		List<Figure> figures = new ArrayList<Figure>();
+		List<Figure> figures = new ArrayList<>();
 		DescriptionFigures.findFigures(pargraphText, figures);
 		Figure fig1 = figures.get(0);
 		Set<String> ids = fig1.getIds();

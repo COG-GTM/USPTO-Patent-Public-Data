@@ -189,7 +189,7 @@ public class JsonMapperFlat implements DocumentBuilder<Patent> {
     }
 
     public String getPrettyPrint(JsonObject jsonObject) throws IOException {
-        Map<String, Boolean> config = new HashMap<String, Boolean>();
+        Map<String, Boolean> config = new HashMap<>();
         config.put(JsonGenerator.PRETTY_PRINTING, true);
 
         JsonWriterFactory writerFactory = Json.createWriterFactory(config);
@@ -206,11 +206,10 @@ public class JsonMapperFlat implements DocumentBuilder<Patent> {
     private JsonArray mapDocIds(Collection<DocumentId> docIds) {
         JsonArrayBuilder arBldr = Json.createArrayBuilder();
         if (docIds != null) {
-            for (DocumentId docId : docIds) {
-                if (docId != null) {
-                    arBldr.add(docId.toText());
-                }
-            }
+            docIds.stream()
+                    .filter(docId -> docId != null)
+                    .map(DocumentId::toText)
+                    .forEach(arBldr::add);
         }
         return arBldr.build();
     }
@@ -226,7 +225,7 @@ public class JsonMapperFlat implements DocumentBuilder<Patent> {
 
             JsonArrayBuilder futherRawAr = Json.createArrayBuilder();
             JsonArrayBuilder futherNormAr = Json.createArrayBuilder();
-            SortedSet<String> futherFacets = new TreeSet<String>();
+            SortedSet<String> futherFacets = new TreeSet<>();
 
             for (PatentClassification furtherClassification : claz.getChildren()) {
                 IpcClassification furtherClass = (IpcClassification) furtherClassification;
@@ -249,7 +248,7 @@ public class JsonMapperFlat implements DocumentBuilder<Patent> {
 
             JsonArrayBuilder futherRawAr = Json.createArrayBuilder();
             JsonArrayBuilder futherNormAr = Json.createArrayBuilder();
-            SortedSet<String> futherFacets = new TreeSet<String>();
+            SortedSet<String> futherFacets = new TreeSet<>();
 
             for (PatentClassification furtherClassification : claz.getChildren()) {
                 UspcClassification furtherClass = (UspcClassification) furtherClassification;
@@ -272,7 +271,7 @@ public class JsonMapperFlat implements DocumentBuilder<Patent> {
 
             JsonArrayBuilder futherRawAr = Json.createArrayBuilder();
             JsonArrayBuilder futherNormAr = Json.createArrayBuilder();
-            SortedSet<String> futherFacets = new TreeSet<String>();
+            SortedSet<String> futherFacets = new TreeSet<>();
 
             for (PatentClassification furtherClassification : claz.getChildren()) {
                 CpcClassification furtherClass = (CpcClassification) furtherClassification;
@@ -287,12 +286,9 @@ public class JsonMapperFlat implements DocumentBuilder<Patent> {
     }
 
     private JsonArray mapExaminerDepartment(Collection<Examiner> examiners) {
-
-        Set<String> depts = new HashSet<String>();
-        for (Examiner examiner : examiners) {
-            depts.add(examiner.getDepartment());
-        }
-
+        Set<String> depts = examiners.stream()
+                .map(Examiner::getDepartment)
+                .collect(java.util.stream.Collectors.toSet());
         return toJsonArray(depts);
     }
 
@@ -355,19 +351,11 @@ public class JsonMapperFlat implements DocumentBuilder<Patent> {
     }
 
     private String valueOrEmpty(String value) {
-        if (value == null) {
-            return "";
-        } else {
-            return value;
-        }
+        return value != null ? value : "";
     }
 
     private String valueOrEmpty(Enum value) {
-        if (value == null) {
-            return "";
-        } else {
-            return value.toString();
-        }
+        return value != null ? value.toString() : "";
     }
 
     private JsonArray mapDate(DocumentDate date, DateTextType dateType) {
@@ -436,11 +424,9 @@ public class JsonMapperFlat implements DocumentBuilder<Patent> {
     private JsonArray toJsonArray(Collection<String> strings) {
         JsonArrayBuilder arBldr = Json.createArrayBuilder();
         if (strings != null) {
-            for (String tok : strings) {
-            	if (tok != null) {
-            		arBldr.add(tok);
-            	}
-            }
+            strings.stream()
+                    .filter(tok -> tok != null)
+                    .forEach(arBldr::add);
         }
         return arBldr.build();
     }
@@ -448,9 +434,7 @@ public class JsonMapperFlat implements DocumentBuilder<Patent> {
     private JsonArray toJsonArray(String... strings) {
         JsonArrayBuilder arBldr = Json.createArrayBuilder();
         if (strings != null) {
-            for (String tok : strings) {
-                arBldr.add(tok);
-            }
+            java.util.Arrays.stream(strings).forEach(arBldr::add);
         }
         return arBldr.build();
     }

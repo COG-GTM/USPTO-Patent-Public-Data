@@ -10,7 +10,7 @@ import org.junit.Test;
 
 public class ReferenceTaggerTest {
 
-	private static Map<String, String> text2Anno = new LinkedHashMap<String, String>();
+	private static Map<String, String> text2Anno = new LinkedHashMap<>();
 	static {
 		text2Anno.put("in claim 1 or 2",
 				"in <a class=\"claim\" idref=\"CLM-0001\">claim 1</a> or <a class=\"claim\" idref=\"CLM-0002\">claim 2</a>");
@@ -38,7 +38,7 @@ public class ReferenceTaggerTest {
 		// class=\"figref\">FIG. 1(a)</a> is");
 	}
 
-	private static Map<String, String> text2NormAnno = new LinkedHashMap<String, String>();
+	private static Map<String, String> text2NormAnno = new LinkedHashMap<>();
 	static {
 		text2NormAnno.put("in claim 1 or 2", "in Patent-Claim");
 		text2NormAnno.put("of claim 2-3", "of Patent-Claim");

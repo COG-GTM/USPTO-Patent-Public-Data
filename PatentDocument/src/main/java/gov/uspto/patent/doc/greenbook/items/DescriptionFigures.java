@@ -32,7 +32,7 @@ public class DescriptionFigures extends ItemReader<List<Figure>> {
 
 	@Override
 	public List<Figure> read() {
-		List<Figure> figures = new ArrayList<Figure>();
+		List<Figure> figures = new ArrayList<>();
 
 		@SuppressWarnings("unchecked")
 		List<Node> paragraphNodes = itemNode.selectNodes("PAR");

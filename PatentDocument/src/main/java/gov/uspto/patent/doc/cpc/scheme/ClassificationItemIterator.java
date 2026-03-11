@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 public class ClassificationItemIterator implements Iterator<ClassificationItem> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ClassificationItemIterator.class);
 
-	private List<Iterator<ClassificationItem>> iteratorChain = new ArrayList<Iterator<ClassificationItem>>();
+	private List<Iterator<ClassificationItem>> iteratorChain = new ArrayList<>();
 	private Iterator<ClassificationItem> currentIterator;
 	private Iterator<ClassificationItem> lastUsedIterator;
 	private int currentIteratorIndex = 0;

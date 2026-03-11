@@ -57,7 +57,7 @@ public class StopWord {
 	};
 
 	private final Path file;
-	private Set<String> stopwords = new HashSet<String>();
+	private Set<String> stopwords = new HashSet<>();
 
 	public StopWord(Path file) {
 		Preconditions.checkArgument(Files.isRegularFile(file, LinkOption.NOFOLLOW_LINKS),
@@ -364,13 +364,7 @@ public class StopWord {
 	 * @return
 	 */
 	public boolean contains(String text) {
-		for (String word : text.split("\\s")) {
-			if (stopwords.contains(word)) {
-				return true;
-			}
-		}
-
-		return false;
+		return Arrays.stream(text.split("\\s")).anyMatch(stopwords::contains);
 	}
 
 	/**
@@ -380,13 +374,7 @@ public class StopWord {
 	 * @return
 	 */
 	public boolean contains(String... text) {
-		for (String word : text) {
-			if (stopwords.contains(word)) {
-				return true;
-			}
-		}
-
-		return false;
+		return Arrays.stream(text).anyMatch(stopwords::contains);
 	}
 
 	/**
@@ -396,13 +384,7 @@ public class StopWord {
 	 * @return
 	 */
 	public boolean contains(Collection<String> text) {
-		for (String word : text) {
-			if (stopwords.contains(word)) {
-				return true;
-			}
-		}
-
-		return false;
+		return text.stream().anyMatch(stopwords::contains);
 	}
 
 	/**
@@ -411,15 +393,9 @@ public class StopWord {
 	 * @return
 	 */
 	public String remove(String text) {
-		StringBuilder result = new StringBuilder(text.length());
-
-		for (String word : text.split("\\s")) {
-			if (!stopwords.contains(word)) {
-				result.append(word).append(" ");
-			}
-		}
-
-		return result.toString().trim();
+		return Arrays.stream(text.split("\\s"))
+				.filter(word -> !stopwords.contains(word))
+				.collect(java.util.stream.Collectors.joining(" "));
 	}
 
 	/**
@@ -428,14 +404,9 @@ public class StopWord {
 	 * @return
 	 */
 	public String[] remove(String... text) {
-		List<String> result = new ArrayList<String>();
-		for (String word : text) {
-			if (!stopwords.contains(word)) {
-				result.add(word);
-			}
-		}
-
-		return result.toArray(new String[result.size()]);
+		return Arrays.stream(text)
+				.filter(word -> !stopwords.contains(word))
+				.toArray(String[]::new);
 	}
 
 	/**
@@ -444,14 +415,9 @@ public class StopWord {
 	 * @return
 	 */
 	public List<String> remove(Collection<String> text) {
-		List<String> result = new ArrayList<String>();
-		for (String word : text) {
-			if (!stopwords.contains(word)) {
-				result.add(word);
-			}
-		}
-
-		return result;
+		return text.stream()
+				.filter(word -> !stopwords.contains(word))
+				.collect(java.util.stream.Collectors.toList());
 	}
 
 	/**
@@ -572,7 +538,7 @@ public class StopWord {
 	 * @return
 	 */
 	public String[] removeLeading(String... text) {
-		List<String> result = new ArrayList<String>();
+		List<String> result = new ArrayList<>();
 
 		boolean leading = true;
 		for (String word : text) {
@@ -592,7 +558,7 @@ public class StopWord {
 	 * @return
 	 */
 	public List<String> removeLeading(Collection<String> text) {
-		List<String> result = new ArrayList<String>();
+		List<String> result = new ArrayList<>();
 
 		boolean leading = true;
 		for (String word : text) {

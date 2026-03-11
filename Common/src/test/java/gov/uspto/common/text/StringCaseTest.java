@@ -14,7 +14,7 @@ public class StringCaseTest {
 
 	// meta-analysis, anti-inflammatory, neo-orthodox, de-emphasize, re-enact, pre-election
 	
-	private static Map<String, String> TitleValidFromTo = new LinkedHashMap<String, String>();
+	private static Map<String, String> TitleValidFromTo = new LinkedHashMap<>();
 	static {
 		TitleValidFromTo.put("LED Lamp", "LED Lamp");
 		TitleValidFromTo.put("Light emitting diode lamp", "Light Emitting Diode Lamp");

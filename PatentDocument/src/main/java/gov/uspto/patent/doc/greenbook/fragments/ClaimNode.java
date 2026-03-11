@@ -29,7 +29,7 @@ public class ClaimNode extends DOMFragmentReader<List<Claim>> {
 
 	@Override
 	public List<Claim> read() {
-		List<Claim> claims = new ArrayList<Claim>();
+		List<Claim> claims = new ArrayList<>();
 		
 		@SuppressWarnings("unchecked")
 		List<Node> childNodes = document.selectNodes(CLAIM_CHILDREN_PATH);
@@ -75,7 +75,7 @@ public class ClaimNode extends DOMFragmentReader<List<Claim>> {
 	}
 
 	private Set<String> getClaimRef(String claimText) {
-		Set<String> claimRefs = new HashSet<String>();
+		Set<String> claimRefs = new HashSet<>();
 		Matcher match = CLAIM_REF.matcher(claimText);
 		while (match.find()) {
 			String id = match.group(1);

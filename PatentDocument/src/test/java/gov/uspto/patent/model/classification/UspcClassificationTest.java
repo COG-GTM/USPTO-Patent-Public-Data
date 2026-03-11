@@ -11,7 +11,7 @@ import org.junit.Test;
 
 public class UspcClassificationTest {
 
-	private static Map<String, String> validFromTo = new LinkedHashMap<String, String>();
+	private static Map<String, String> validFromTo = new LinkedHashMap<>();
 
 	static {
 		validFromTo.put("  2 52", "002/052000000");

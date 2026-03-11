@@ -119,7 +119,7 @@ public class JsonMapper implements DocumentBuilder<Patent> {
 
     
     public String getPrettyPrint(JsonObject jsonObject) throws IOException {
-        Map<String, Boolean> config = new HashMap<String, Boolean>();
+        Map<String, Boolean> config = new HashMap<>();
         config.put(JsonGenerator.PRETTY_PRINTING, true);
 
         JsonWriterFactory writerFactory = Json.createWriterFactory(config);
@@ -149,11 +149,10 @@ public class JsonMapper implements DocumentBuilder<Patent> {
     private JsonArray mapDocIds(Collection<DocumentId> docIds) {
         JsonArrayBuilder arBldr = Json.createArrayBuilder();
         if (docIds != null) {
-            for (DocumentId docId : docIds) {
-                if (docId != null) {
-                    arBldr.add(docId.toText());
-                }
-            }
+            docIds.stream()
+                    .filter(docId -> docId != null)
+                    .map(DocumentId::toText)
+                    .forEach(arBldr::add);
         }
         return arBldr.build();
     }
@@ -243,19 +242,11 @@ public class JsonMapper implements DocumentBuilder<Patent> {
      * @return
      */
     private String valueOrEmpty(String value) {
-        if (value == null) {
-            return "";
-        } else {
-            return value;
-        }
+        return value != null ? value : "";
     }
 
     private String valueOrEmpty(Enum value) {
-        if (value == null) {
-            return "";
-        } else {
-            return value.toString();
-        }
+        return value != null ? value.toString() : "";
     }
 
     private JsonObject mapDate(DocumentDate date) {
@@ -426,9 +417,7 @@ public class JsonMapper implements DocumentBuilder<Patent> {
     private JsonArray toJsonArray(Collection<String> strings) {
         JsonArrayBuilder arBldr = Json.createArrayBuilder();
         if (strings != null) {
-            for (String tok : strings) {
-                arBldr.add(tok);
-            }
+            strings.forEach(arBldr::add);
         }
         return arBldr.build();
     }
@@ -439,9 +428,7 @@ public class JsonMapper implements DocumentBuilder<Patent> {
             arBldr.add(jsonArray.get(i));
         }
         if (strings != null) {
-            for (String tok : strings) {
-                arBldr.add(tok);
-            }
+            strings.forEach(arBldr::add);
         }
         return arBldr.build();
     }
@@ -449,9 +436,7 @@ public class JsonMapper implements DocumentBuilder<Patent> {
     private JsonArray toJsonArray(String... strings) {
         JsonArrayBuilder arBldr = Json.createArrayBuilder();
         if (strings != null) {
-            for (String tok : strings) {
-                arBldr.add(tok);
-            }
+            java.util.Arrays.stream(strings).forEach(arBldr::add);
         }
         return arBldr.build();
     }

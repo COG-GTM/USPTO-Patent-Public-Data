@@ -9,7 +9,7 @@ public class UnicodeUtil {
 	public static final Character PARAGRAPH = '\u2029';
 
 	/*
-	private static final HashMap<String, Character> FRACTION_TO_UNICODE = new HashMap<String, Character>();
+	private static final HashMap<String, Character> FRACTION_TO_UNICODE = new HashMap<>();
 	static {
 		FRACTION_TO_UNICODE.put("1/4", '\u00BC'); 
 		FRACTION_TO_UNICODE.put("1/2", '\u00BD'); 
@@ -29,7 +29,7 @@ public class UnicodeUtil {
 	}
 	*/
 
-	private static Map<Character, Character> SUBSCRIPT = new HashMap<Character, Character>();
+	private static Map<Character, Character> SUBSCRIPT = new HashMap<>();
 	static {
 		SUBSCRIPT.put('0', '\u2080');
 		SUBSCRIPT.put('1', '\u2081');
@@ -61,7 +61,7 @@ public class UnicodeUtil {
 		SUBSCRIPT.put(' ', ' ');
 	};
 
-	private static Map<Character, Character> SUPERSCRIPT = new HashMap<Character, Character>();
+	private static Map<Character, Character> SUPERSCRIPT = new HashMap<>();
 	static {
 		SUPERSCRIPT.put('0', '\u2070');
 		SUPERSCRIPT.put('1', '\u00B9');

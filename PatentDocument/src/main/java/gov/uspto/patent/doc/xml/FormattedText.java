@@ -399,12 +399,9 @@ public class FormattedText implements TextProcessor {
 		String textWithPMarks = getSimpleHtml(rawText);
 		Document jsoupDoc = Jsoup.parse(textWithPMarks, "", Parser.xmlParser());
 
-		List<String> paragraphs = new ArrayList<String>();
-		for (Element element : jsoupDoc.select("p")) {
-			paragraphs.add(element.html());
-		}
-
-		return paragraphs;
+		return jsoupDoc.select("p").stream()
+				.map(Element::html)
+				.collect(java.util.stream.Collectors.toList());
 	}
 
 }

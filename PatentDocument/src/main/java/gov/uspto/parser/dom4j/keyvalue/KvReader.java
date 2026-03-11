@@ -67,10 +67,10 @@ public class KvReader {
     }
     */
 
-	private List<String> maintainSpaceFields = new ArrayList<String>();
-	private List<String> paragraphFields = new ArrayList<String>();
-	private List<String> headerFields = new ArrayList<String>();
-	private List<String> tableFields = new ArrayList<String>();
+	private List<String> maintainSpaceFields = new ArrayList<>();
+	private List<String> paragraphFields = new ArrayList<>();
+	private List<String> headerFields = new ArrayList<>();
+	private List<String> tableFields = new ArrayList<>();
 
 	private String currentFieldName;
 
@@ -297,7 +297,7 @@ public class KvReader {
      * @throws IOException
      */
     public List<KeyValue> parse(Reader reader) throws PatentReaderException {
-        List<KeyValue> keyValues = new ArrayList<KeyValue>();
+        List<KeyValue> keyValues = new ArrayList<>();
         currentFieldName = "";
 
         try (BufferedReader breader = new BufferedReader(reader)) {
@@ -417,7 +417,7 @@ public class KvReader {
 
         File inputFile = new File(args[0]);
 
-        List<FieldGroup> fieldGroups = new ArrayList<FieldGroup>();
+        List<FieldGroup> fieldGroups = new ArrayList<>();
         fieldGroups.add(new FieldGroup("APPLICANT").setAncorField("AANM").addField("AACI", "AAST", "AAZP", "AACO",
                 "AATX", "AAGP", "AAAT"));
         fieldGroups.add(new FieldGroup("INVENTOR").setAncorField("INNM").addField("INSA", "INCI", "INST", "INZP",

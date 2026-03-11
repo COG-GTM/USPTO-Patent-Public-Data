@@ -301,7 +301,7 @@ public class Corpus {
 
         LOGGER.info("Request: {}", yearMap);
 
-		List<PatentClassification> wantedClasses = new ArrayList<PatentClassification>();
+		List<PatentClassification> wantedClasses = new ArrayList<>();
 		List<String> cpcs = Splitter.on(',').omitEmptyStrings().trimResults().splitToList(cpc);
 		for (String cpcStr : cpcs) {
 			CpcClassification cpcClass = new CpcClassification();

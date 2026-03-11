@@ -27,7 +27,7 @@ public class PctRegionalIdNode extends DOMFragmentReader<List<DocumentId>> {
 
 	@Override
 	public List<DocumentId> read() {
-		List<DocumentId> docIds = new ArrayList<DocumentId>();
+		List<DocumentId> docIds = new ArrayList<>();
 
 		Node pctGroupN = document.selectSingleNode(FRAGMENT_PATH);
 		if (pctGroupN == null) {

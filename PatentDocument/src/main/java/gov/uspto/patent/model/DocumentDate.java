@@ -1,6 +1,10 @@
 package gov.uspto.patent.model;
 
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -33,9 +37,7 @@ public class DocumentDate {
     }
 
     public int getYear() {
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-        calendar.setTime(date);
-        return calendar.get(Calendar.YEAR);
+        return date.toInstant().atZone(ZoneOffset.UTC).getYear();
     }
 
     public void setDate(String date) throws InvalidDataException {

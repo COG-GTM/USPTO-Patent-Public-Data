@@ -37,7 +37,7 @@ public class CitationNode extends DOMFragmentReader<List<Citation>> {
 
 	@Override
 	public List<Citation> read() {
-		List<Citation> citations = new ArrayList<Citation>();
+		List<Citation> citations = new ArrayList<>();
 
 		citationNode = document.selectSingleNode(FRAGMENT_PATH);
 		if (citationNode == null) {
@@ -54,7 +54,7 @@ public class CitationNode extends DOMFragmentReader<List<Citation>> {
 	}
 
 	public List<Citation> readNplCitations() {
-		List<Citation> nplCitations = new ArrayList<Citation>();
+		List<Citation> nplCitations = new ArrayList<>();
 
 		@SuppressWarnings("unchecked")
 		List<Node> nlpcitNodes = citationNode.selectNodes("us-citation/nplcite|citation/nplcit");
@@ -79,7 +79,7 @@ public class CitationNode extends DOMFragmentReader<List<Citation>> {
 	}
 
 	public List<Citation> readPatCitations() {
-		List<Citation> patCitations = new ArrayList<Citation>();
+		List<Citation> patCitations = new ArrayList<>();
 
 		@SuppressWarnings("unchecked")
 		List<Node> patcitNodes = citationNode.selectNodes("citation/patcit|us-citation/patcit");

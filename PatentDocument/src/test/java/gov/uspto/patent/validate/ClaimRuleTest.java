@@ -21,7 +21,7 @@ public class ClaimRuleTest {
 	@Test
 	public void emptyClaimListFail() {
 		PatentApplication patent = new PatentApplication(new DocumentId(CountryCode.US, "99999"), PatentType.UTILITY);
-		List<Claim> claims = new ArrayList<Claim>();
+		List<Claim> claims = new ArrayList<>();
 		patent.setClaim(claims);
 		assertFalse(claimRule.test(patent));
 	}
@@ -29,7 +29,7 @@ public class ClaimRuleTest {
 	@Test
 	public void smallFirstClaimFail() {
 		PatentApplication patent = new PatentApplication(new DocumentId(CountryCode.US, "99999"), PatentType.UTILITY);
-		List<Claim> claims = new ArrayList<Claim>();
+		List<Claim> claims = new ArrayList<>();
 		Claim claim = new Claim("CLAIM-1", "my first claim", ClaimType.INDEPENDENT, new DummyFormattedText());
 		claims.add(claim);
 		patent.setClaim(claims);

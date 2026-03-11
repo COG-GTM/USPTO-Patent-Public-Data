@@ -109,7 +109,7 @@ public class Address {
 	 * @return
 	 */
 	public Set<String> getTokenSet() {
-		Set<String> tokens = new LinkedHashSet<String>();
+		Set<String> tokens = new LinkedHashSet<>();
 
 		if (!Strings.isNullOrEmpty(city)) {
 			tokens.add(city);

@@ -29,7 +29,7 @@ public class CitationNode extends DOMFragmentReader<List<Citation>> {
 
 	@Override
 	public List<Citation> read() {
-		List<Citation> citations = new ArrayList<Citation>();
+		List<Citation> citations = new ArrayList<>();
 
 		@SuppressWarnings("unchecked")
 		List<Node> citeNodes = document.selectNodes(PATENT_PATH);

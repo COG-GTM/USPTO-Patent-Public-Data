@@ -5,6 +5,31 @@ Tool kit to download, read, and utilize open patent data provided to the public.
 ### Notice
 This source code is a work in progress and has not been fully vetted for a production environment. 
 
+### Prerequisites
+- **Java 8** (JDK 1.8) or higher
+- **Apache Maven 3.x**
+
+### Setup and Build
+```bash
+# Clone the repository
+git clone https://github.com/COG-GTM/USPTO-Patent-Public-Data.git
+cd USPTO-Patent-Public-Data
+
+# Build the project
+mvn clean package
+
+# Run tests
+mvn clean test
+```
+
+### Java 8 Features
+This project uses Java 8 language features and APIs including:
+- **Lambda expressions** and **method references** for concise functional-style code
+- **Streams API** for declarative collection processing
+- **Diamond operator** (`<>`) for cleaner generic type inference
+- **`java.time` API** (`Instant`, `LocalDate`, `ZonedDateTime`) replacing legacy `Date`/`Calendar` usage
+- **`jackson-datatype-jdk8`** for Java 8 type serialization support
+
 ### Two main modules
 <ul>
 <li><b><a href="https://github.com/USPTO/PatentPublicData/tree/master/BulkDownloader">Bulk Downloader</a></b> automates downloading of public bulk patent data</li>

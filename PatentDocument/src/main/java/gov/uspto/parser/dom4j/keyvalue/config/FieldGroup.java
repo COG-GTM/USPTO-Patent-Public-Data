@@ -5,7 +5,7 @@ import java.util.List;
 
 public class FieldGroup {
     private String name;
-    private List<Field> fields = new ArrayList<Field>();
+    private List<Field> fields = new ArrayList<>();
     private boolean isMultivalued = false; // multiple occurrence, true if ancorField.
 
     public FieldGroup(String name) {
@@ -62,7 +62,7 @@ public class FieldGroup {
     }
 
     public static List<Field> genAnchorFieldList(List<Field> fields) {
-        List<Field> achorFields = new ArrayList<Field>();
+        List<Field> achorFields = new ArrayList<>();
         for (Field field : fields) {
             if (field.isAchor()) {
                 achorFields.add(field);

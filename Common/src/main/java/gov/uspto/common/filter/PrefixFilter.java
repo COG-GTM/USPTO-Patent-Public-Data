@@ -13,12 +13,7 @@ public class PrefixFilter implements FileFilter, StringFilter {
 
     @Override
     public boolean accept(String valueStr) {
-        for (String prefix : prefixes) {
-            if (valueStr.startsWith(prefix)) {
-                return true;
-            }
-        }
-        return false;
+        return Arrays.stream(prefixes).anyMatch(valueStr::startsWith);
     }
 
     @Override

@@ -218,7 +218,7 @@ public class DocumentId implements Comparable<DocumentId> {
     }
 
     public static List<DocumentId> getByType(Collection<DocumentId> docIds, DocumentIdType type) {
-        List<DocumentId> redIds = new LinkedList<DocumentId>();
+        List<DocumentId> redIds = new LinkedList<>();
 
         for (DocumentId docId : docIds) {
             if (docId != null && docId.getType() == type) {

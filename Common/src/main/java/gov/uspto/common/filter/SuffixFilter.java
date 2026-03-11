@@ -13,12 +13,8 @@ public class SuffixFilter implements FileFilter, StringFilter {
 
     @Override
     public boolean accept(String valueStr) {
-        for (String suffix : suffixes) {
-            if (valueStr.toLowerCase().endsWith(suffix)) {
-                return true;
-            }
-        }
-        return false;
+        String lowerVal = valueStr.toLowerCase();
+        return Arrays.stream(suffixes).anyMatch(lowerVal::endsWith);
     }
 
     @Override

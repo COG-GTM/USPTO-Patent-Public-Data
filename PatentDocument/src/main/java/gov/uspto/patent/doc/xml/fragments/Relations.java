@@ -41,7 +41,7 @@ public class Relations extends DOMFragmentReader<List<DocumentId>> {
 
 	@Override
 	public List<DocumentId> read() {
-		docIds = new ArrayList<DocumentId>();
+		docIds = new ArrayList<>();
 		
 		getDocIds(ADDITION, DocumentIdType.ADDITION);
 		

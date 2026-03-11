@@ -62,7 +62,7 @@ public class UspcClassification extends PatentClassification {
 	private final static Pattern RANGE_REGEX = Pattern.compile("-([0-9A-Z]{1,9})$");
 
 	private String mainClass;
-	private SortedSet<String> subClass = new TreeSet<String>();
+	private SortedSet<String> subClass = new TreeSet<>();
 
 	@Override
 	public ClassificationType getType() {
@@ -132,7 +132,7 @@ public class UspcClassification extends PatentClassification {
 	 */
 	@Override
 	public String[] toFacet() {
-		Set<String> retFacets = new HashSet<String>();
+		Set<String> retFacets = new HashSet<>();
 		for (String subRange : subClass) {
 			String[] facets = ClassificationTokenizer.partsToFacet(mainClass, subRange);
 			retFacets.addAll(Arrays.asList(facets));
@@ -149,7 +149,7 @@ public class UspcClassification extends PatentClassification {
 	 * @return
 	 */
 	public Set<String> toSet() {
-		Set<String> formats = new LinkedHashSet<String>();
+		Set<String> formats = new LinkedHashSet<>();
 		formats.add(mainClass);
 
 		for (String subRange : subClass) {
@@ -212,7 +212,7 @@ public class UspcClassification extends PatentClassification {
 
 			setMainClass(mainClass);
 
-			SortedSet<String> subClassRange = new TreeSet<String>();
+			SortedSet<String> subClassRange = new TreeSet<>();
 			subClassRange.add(Strings.padEnd(subClass, 9, '0'));
 
 			if (backRange != null) {

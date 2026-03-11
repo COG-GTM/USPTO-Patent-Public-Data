@@ -12,7 +12,7 @@ public class BraceCodesTest {
 
 	private static BraceCodes braceCode = new  BraceCodes();
 
-	private static Map<String, String> accentOver = new LinkedHashMap<String, String>();
+	private static Map<String, String> accentOver = new LinkedHashMap<>();
 	static {
 		accentOver.put("Andr{acute over (e)}", "Andr\u00E9"); // Andrê
 		accentOver.put("jalape{tilde over(n)}o", "jalape\u00F1o"); // jalapeño
@@ -20,24 +20,24 @@ public class BraceCodesTest {
 				// puree purée püree
 	}
 
-	private static Map<String, String> accentGreek = new LinkedHashMap<String, String>();
+	private static Map<String, String> accentGreek = new LinkedHashMap<>();
 	static {
 		accentGreek.put("{circumflex (\u03B8)}", "\u03B8"); // theta_circumflex
 	}
 
-	private static Map<String, String> accentMathSymbols = new LinkedHashMap<String, String>();
+	private static Map<String, String> accentMathSymbols = new LinkedHashMap<>();
 	static {
 		accentMathSymbols.put("{hacek over (\u2207)}", "\u030C\u2207"); // hacek nabla  Grant US8139142B2
 	}
 
-	private static Map<String, String> nested = new LinkedHashMap<String, String>();
+	private static Map<String, String> nested = new LinkedHashMap<>();
 	static {
 		nested.put("{dot over ({tilde over (\u03C6)}}", "\u0307\u0303\u03C6"); // Grant US6192305B1
 		nested.put(" {umlaut over ({circumflex over (\u03C6)}})}", "\u0308\u0302\u03C6"); // Grant US6192305B1
 		nested.put("{tilde over ({circumflex over (K)})}", "\u0303\u0302K"); // Grant US6341257B1
 	}
 
-	private static Map<String, String> unicodeComposit = new LinkedHashMap<String, String>();
+	private static Map<String, String> unicodeComposit = new LinkedHashMap<>();
 	static {
 		unicodeComposit.put("{hacek over (\u0125)}", "\u030C\u0125");
 		unicodeComposit.put("{grave over (p)}", "\u0300p");

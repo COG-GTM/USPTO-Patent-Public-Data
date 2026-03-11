@@ -27,7 +27,7 @@ public class AssigneeNode extends DOMFragmentReader<List<Assignee>> {
 
 	@Override
 	public List<Assignee> read() {
-		List<Assignee> assigneeList = new ArrayList<Assignee>();
+		List<Assignee> assigneeList = new ArrayList<>();
 
 		@SuppressWarnings("unchecked")
 		List<Node> assignees = document.selectNodes(FRAGMENT_PATH);

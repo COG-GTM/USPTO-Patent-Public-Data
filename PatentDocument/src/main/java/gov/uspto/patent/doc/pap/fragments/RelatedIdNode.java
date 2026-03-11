@@ -14,7 +14,7 @@ import gov.uspto.patent.model.DocumentIdType;
 public class RelatedIdNode extends DOMFragmentReader<List<DocumentId>> {
     private static final String FRAGMENT_PATH = "/patent-application-publication/subdoc-bibliographic-information/continuity-data";
 
-    private List<DocumentId> relatedDocIds = new ArrayList<DocumentId>();
+    private List<DocumentId> relatedDocIds = new ArrayList<>();
 
     public RelatedIdNode(Document document) {
         super(document);

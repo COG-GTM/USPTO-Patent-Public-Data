@@ -3,6 +3,7 @@ package gov.uspto.patent.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Build Claim Tree by adding child claims to each claim a claim is dependent on; 
@@ -58,14 +59,8 @@ public class ClaimTreeBuilder {
      * @return
      */
     public List<Claim> getClaims(Collection<String> claimIds) {
-        List<Claim> foundClaims = new ArrayList<Claim>();
-        for (String claimId : claimIds) {
-            for (Claim claim : this.claims) {
-                if (claim.getId().equals(claimId)) {
-                    foundClaims.add(claim);
-                }
-            }
-        }
-        return foundClaims;
+        return this.claims.stream()
+                .filter(claim -> claimIds.contains(claim.getId()))
+                .collect(Collectors.toList());
     }
 }

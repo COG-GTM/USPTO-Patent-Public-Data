@@ -10,7 +10,7 @@ import org.junit.Test;
 
 public class DotCodesTest {
 
-	private static Map<String, String> dotCodes = new LinkedHashMap<String, String>();
+	private static Map<String, String> dotCodes = new LinkedHashMap<>();
 	static {
 		dotCodes.put(".-+.", "\u2213");
 		dotCodes.put(".dblquote.", "\"");
@@ -21,7 +21,7 @@ public class DotCodesTest {
 		dotCodes.put("6-.beta.-glucanase", "6-\u03B2-glucanase");
 	}
 
-	private static Map<String, String> dotSubCodes = new LinkedHashMap<String, String>();
+	private static Map<String, String> dotSubCodes = new LinkedHashMap<>();
 	static {
 		dotSubCodes.put("h.sub.2.O", "h<sub>2</sub>O");
 		dotSubCodes.put("D.sub.2, D.sub.3, D.sub.4 .", "D<sub>2</sub>, D<sub>3</sub>, D<sub>4</sub> .");
@@ -34,7 +34,7 @@ public class DotCodesTest {
 		dotSubCodes.put(".sup.1+2 ", "<sup>1+2</sup> ");
 	}
 
-	private static Map<String, String> combined = new LinkedHashMap<String, String>();
+	private static Map<String, String> combined = new LinkedHashMap<>();
 	static {
 		combined.put(".sup..TM. ", "<sup>\u2122</sup> ");
 		combined.put(".sup..alpha. ", "<sup>\u03B1</sup> ");

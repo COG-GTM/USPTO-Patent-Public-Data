@@ -11,7 +11,7 @@ import gov.uspto.common.DateRange;
 
 public class DateRangeStringFilter implements FileFilter, StringFilter {
     private DateRange dateRange;
-    private List<Pattern> nameDateRegexs = new ArrayList<Pattern>();
+    private List<Pattern> nameDateRegexs = new ArrayList<>();
 
     public DateRangeStringFilter(DateRange dateRange, String... regexes) {
         this.dateRange = dateRange;

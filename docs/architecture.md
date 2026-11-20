@@ -61,11 +61,17 @@ A library for managing authenticators (credentials) in line with NIST SP 800-53 
 management) and AC-7 (unsuccessful logon attempts). No class in `Common`, `PatentDocument` or
 `BulkDownloader` references it; it is built and tested with the rest of the reactor.
 
-- **`core`** - `AuthenticationConfig` loads `authentication.properties` from the classpath (none is shipped;
-  defaults apply) and lets environment variables override each key (`auth.max.login.attempts` ->
-  `AUTH_MAX_LOGIN_ATTEMPTS`). Defaults: 12-character passwords with complexity, 90-day expiry, 3 failed
-  attempts then a 15-minute lockout, 30-minute sessions, 60-minute tokens. Also holds `Principal`,
-  `Credential`, `AuthenticationResult` and exceptions.
+- **`core`** - `AuthenticationConfig` holds the settings. Defaults: 12-character passwords with complexity,
+  90-day expiry, 3 failed attempts then a 15-minute lockout, 30-minute sessions, 60-minute tokens.
+  - `new AuthenticationConfig()` uses only these defaults: it reads no file and no environment variables.
+  - `new AuthenticationConfig("<file>")` loads that properties file from the classpath (keys such as
+    `auth.max.login.attempts`, `auth.fips.enabled`). Only when the file is found, an environment variable
+    named after the key (`AUTH_MAX_LOGIN_ATTEMPTS`) wins over the file's value. If the file is missing, the
+    defaults apply and environment variables are ignored.
+  - No `authentication.properties` is shipped, and the `DEFAULT_CONFIG_FILE` constant naming it is not used.
+  - Setters can change any value after construction.
+
+  The package also holds `Principal`, `Credential`, `AuthenticationResult` and exceptions.
 - **`authenticator`** - `AuthenticatorManager` and its `InMemoryAuthenticatorManager` implementation cover the
   authenticator lifecycle: create, validate, update (with password-history check), revoke, expire, renew,
   and lock out after failed attempts. Types: `PASSWORD`, `PKI_CERT`, `HARDWARE_TOKEN`, `API_KEY`; statuses:

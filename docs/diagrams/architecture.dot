@@ -1,0 +1,75 @@
+// USPTO-Patent-Public-Data architecture. Edit here, then run ./render.sh.
+digraph architecture {
+  graph [rankdir=TB, fontname="DejaVu Sans", fontsize=18, nodesep=0.35, ranksep=0.55, pad=0.3,
+         label="USPTO-Patent-Public-Data (master): Maven modules, data flow and external systems", labelloc=t];
+  node  [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=15, fillcolor=white, color="#555555"];
+  edge  [fontname="DejaVu Sans", fontsize=12, color="#444444"];
+
+  subgraph cluster_external {
+    label="External data sources"; style="rounded,filled"; fillcolor="#fdf2e9"; color="#d35400";
+    uspto   [label="USPTO bulk data\ndata.uspto.gov/bulkdata/datasets\n(grant / application / gazette zips)"];
+    mirrors [label="Reedtech + Google mirrors\n(sources.xml)"];
+    cpc     [label="CPC scheme + CPC master\nclassification files"];
+    fda     [label="FDA NDC drug list\n(sources.xml)"];
+    {rank=same; uspto; mirrors;}
+    {rank=same; cpc; fda;}
+    uspto -> cpc [style=invis]; mirrors -> fda [style=invis];
+  }
+
+  subgraph cluster_bulk {
+    label="BulkDownloader (gov.uspto.bulkdata)"; style="rounded,filled"; fillcolor="#eaf2f8"; color="#2471a3";
+    bulkdata [label="cli2.BulkData\n--type grant|application|gazette\n--date range"];
+    download [label="cli.Download / cli.DownloadFile\n(source + type from sources.xml)"];
+    corpus   [label="corpusbuilder.Corpus\nfilter by CPC / USPC per bulk file"];
+    look     [label="cli.Look / cli.ExtractPatent\nview or extract one document"];
+    dl       [label="downloader.Downloader\nOkHttp, async, retry, restart"];
+    {rank=same; bulkdata; download;}
+    {rank=same; corpus; look;}
+  }
+
+  files [label="Local bulk files\n./download/*.zip", shape=folder, fillcolor="#fef9e7"];
+
+  subgraph cluster_doc {
+    label="PatentDocument (gov.uspto.patent)"; style="rounded,filled"; fillcolor="#e9f7ef"; color="#1e8449";
+    dump    [label="bulk.DumpReader\nDumpFileXml / DumpFileAps\n(iterate docs inside a zip)"];
+    detect  [label="PatentDocFormatDetect"];
+    reader  [label="PatentReader\nformat -> parser"];
+    parsers [label="doc.greenbook (APS 1976-2001)\ndoc.sgml (Red Book SGML 2001-2004)\ndoc.pap (PAP XML 2002-2004)\ndoc.xml Grant/ApplicationParser (2004-)"];
+    model   [label="model.Patent\nnormalized object model\n+ validate rules"];
+    json    [label="serialize.JsonMapper / JsonMapperFlat\nTransformerCli"];
+  }
+
+  out [label="Outputs\nXML extracts, corpus XML/zip, JSON", shape=folder, fillcolor="#fef9e7"];
+
+  common [label="Common (gov.uspto.common)\nfile/archive iterators, filters,\npredicates, text utils, DateRange", fillcolor="#f4f6f6"];
+
+  subgraph cluster_auth {
+    label="AuthenticationService (gov.uspto.auth) - standalone library, no callers in other modules"; style="rounded,filled"; fillcolor="#f5eef8"; color="#7d3c98";
+    acore  [label="core\nAuthenticationConfig (authentication.properties / env)\nPrincipal, Credential, AuthenticationResult"];
+    prov   [label="password.PasswordAuthenticationProvider\npki.PKIAuthenticationProvider\nmfa.MultiFactorAuthenticator"];
+    mgr    [label="authenticator.InMemoryAuthenticatorManager\nNIST IA-5 lifecycle: create, validate,\nupdate, revoke, expire, renew, lockout"];
+    store  [label="storage.InMemoryAuthenticationStorage\n(authenticators, password history,\nfailed attempts; in-process only)"];
+    hash   [label="password.PasswordHasher (jBCrypt)\nPasswordPolicy / PasswordValidator"];
+    ifaces [label="Interfaces only, no implementation:\nSessionManager, CryptoService, IdentifierManager,\nIdentityProofing, AuthenticationPolicy, ServiceAuthenticator", fillcolor="#fbfcfc", style="rounded,dashed,filled"];
+    {rank=same; ifaces; fips;}
+    fips   [label="bc-fips / bcpkix-fips declared;\nfipsEnabled flag not yet read by code", fillcolor="#fbfcfc", style="rounded,dashed,filled"];
+  }
+
+  ci [label="GitHub Actions: sonarcloud.yml\nJDK 17, mvn verify -DskipTests + SonarCloud scan", shape=component, fillcolor="#fbeee6"];
+
+  uspto -> dl; mirrors -> dl; cpc -> dl; fda -> dl;
+  bulkdata -> dl; download -> dl; corpus -> dl [label="one file at a time"];
+  dl -> files;
+  files -> look; files -> corpus [style=dashed];
+  look -> dump [label="uses PatentDocument"]; corpus -> dump;
+  files -> dump [label="TransformerCli --input"];
+  dump -> detect -> reader -> parsers -> model -> json;
+  json -> out; look -> out; corpus -> out [style=dashed];
+  common -> dump [style=dotted, arrowhead=none, label="shared utilities"];
+  common -> dl [style=dotted, arrowhead=none];
+
+  prov -> acore; prov -> hash; mgr -> hash; mgr -> store; prov -> store [style=dashed];
+  acore -> ifaces [style=invis]; mgr -> fips [style=invis];
+  out -> acore [style=invis];
+  out -> ci [style=invis];
+}
